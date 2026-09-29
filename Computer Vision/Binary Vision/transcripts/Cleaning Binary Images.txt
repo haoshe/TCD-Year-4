@@ -1,0 +1,217 @@
+Right, in this session we're going to consider cleaning binary images. So at this point you
+should have already covered the binary introduction, the one that looked at creating
+thresholds or thresholding images and working out what the threshold should be. And then finally
+looking at adaptive thresholding and multi-spectral thresholding. So at this point we're going
+to assume that we have a binary image, an image that consists of ones and zeros. We say ones
+and zeros and obviously frequently they're represented as 255 and zero, but effectively
+they're the same thing. So we can choose normal smoothing operations. Normal smoothing operations
+are where we take local averages or such things of pixels and their neighbours. But if we do
+that then we're going to end up with values which are neither one nor zero. And we want
+to remain within a binary image. So normal smoothing is just not feasible for this type of processing,
+for this type of image.
+We frequently need to remove noisy points. So when we create our binary image we often end
+up with points which are on their own and are just points that appear to be of interest but
+don't have any other points around them. And we often end up with regions which have very
+rough boundaries and it can help to smooth those region boundaries in order to process
+them, say to analyse their shape or something like that. And if we have very jagged boundaries
+it can be very difficult to analyse those region shapes. Mostly we use operations which were originally
+defined as part of something called mathematical morphology. Where we're treating images effectively
+as sets. This is a huge area of image processing. Although it's one that wouldn't be regarded
+as sort of the norm. But it is, parts of it are used quite extensively in processing binary
+images. And the parts that are used most extensively would be erosion and dilation which are then
+combined into two operations called opening and closing. So I'd have to say if you want to go
+further with this you need to go and have a look at mathematical morphology on its own as a topic.
+And it's very useful for doing this type of processing. So we're going to have a look at these
+four operations and we're going to see what we can do to try and improve our images and to try and extract
+out the objects that we're particularly interested in. All of this is defined in terms of sets. So the maths
+behind it looks a little bit strange. Maybe I'll show you the example first and we'll go back to this
+maths in just a second. So the idea of dilation, the first operation we're going to consider, is that if
+you took the image on the left, which is a binary image, and I'm assuming that the blue points are the
+ones that are of interest, that we are going to effectively expand out those blue points and we'll
+get to the image on the right. So if we expand them out, if we add pixels around all of the existing
+object pixels, we get that image on the right. Which might not seem that useful, but if we look at the
+printed circuit board over here, what we can see is that we're getting a lot more solid solidity to
+these lines. And that there are reasons that we might want to do this, just say to try and find
+connections between tracks, so tracks that are laid down too close together. If you look at the very
+lowest circle in the center of the image of the top, sorry, the image of the top, you'll see that when
+it's expanded out, it almost touches the line that's right beside it, the circuit track that's right beside
+it. And that is a potential connection, or could be a potential connection. So this is the sore thing
+that we do with this. You'll probably see some other examples which will help you understand more
+and more as to why we want to do this type of processing. Okay, so going back to the first line of the
+maths, the Minkowski set edition, we have two sets that we're adding together and we're trying to produce a set P.
+And the two sets we're adding together are X and B. X is the original image. The capital X is the original image.
+So the little x is a point that exists within the original image. Okay, an object point that exists
+within the original image, more at the point. The structuring element, capital B, is shown as the
+3x3 region, with a little cross in the centre, and a little x in the centre. A structuring element is effectively
+going to be used in combination with the current point to allow us to consider neighbouring points,
+to work out which points we want to consider. So the way the maths works there is you've got X plus B,
+so P is equal to X plus B. So if I consider a point X, and then I add to that point X, I add all the points
+B that are around it. So if I have an individual pixel, I'll end up with a 3x3 region of pixels.
+All of those pixels will belong to P, will be in P. And that's what you're seeing. So if you looked at any of
+the blue pixels in the image on the left hand side, all of those pixels have a 3x3 region added to them,
+in effect, and added in to the output. And it gives us our expanded object pixels, or objects of interest.
+So this technique makes regions bigger. It makes binary regions bigger. In fact, it's doing it just by
+considering each binary object pixel, and adding pixels around that. It does have the effect of
+filling in small holes. And you can see that both in the image, the blue and white image,
+and also in the image on the right, you can see some of the holes in the PCB are being filled in.
+And that's the type of processing we might want to do at some point.
+And it joins close regions. So sometimes we use that to try and find regions that are too close
+together. Sometimes we use that to connect regions which are accidentally broken apart
+through the processing, through the creation of the binary image.
+The other technique that we need to consider is erosion. That's not quite the opposite, but we've got the
+same structuring elements, and we've got similar maths, shall we say. So if we look at this here,
+what it's going to do is it's going to remove border pixels. So the last one was adding pixels around the border.
+This one's going to remove border pixels, but these are not inverse operations.
+So we, you look at the little l, if you like, of pixels, which disappears completely. It's clear that
+if we do a dilation, that won't reappear. Okay. Now, for this type of processing, what has to happen is
+that if we consider a single pixel in the input image, okay, that pixel and all of its neighbors,
+as defined by the structuring element, have to be within the input image in order for the center pixel
+to appear in the output image. So that's the basic idea of erosion. You could look at it and say,
+look, it just takes away all the border pixels, which is sort of a logical way to do it, but it's not
+how mathematical morphology is doing it. So in the maths, what it says is P plus B. So for an output
+pixel P, if we consider, if we add the structuring element to that, that will give us a three by three
+region. And all of those elements must be within the input image X. Okay. So that's the formalism of it,
+is, is that all the pixels around a particular output pixel, when we consider those pixels in the input
+image, they must all be object pixels. They must all be pixels that are of interest to us. And you'll
+see the restricted set of pixels, which are output on the right hand side as our eroded image. If we go
+back to our PCB example, if we do the erosion, what we'll see is that we're, we're making the tracks much,
+much thinner. And if you look below that center circle at the bottom of the image, you'll see that one of
+the PCB tracks has actually got broken quite significantly. And in the original image is
+quite thin. So that's a potential problem on the circuit board, that if the circuit that's been laid
+down is too narrow, that it won't carry the signal properly. So we do, we do that type of processing in
+order to identify potential problems on a PCB. Okay. So what this does in effect is it makes regions
+smaller, and it removes noise points. So if you had a point sitting on its own, or even that little
+three blue pixels, which were in red, are being removed completely. It removes narrow bridges. So
+if there are two regions which are connected by a very small, thin line of pixels, that bridge will disappear.
+And that can be useful in certain circumstances.
+We can combine erosion and dilation, and this is probably where it gets even more interesting and
+more useful for us. So one of the problems with doing erosion is that the number of object pixels, and
+therefore the size of the objects that we're considering becomes smaller. If we do dilation,
+the number of pixels associated with the objects become bigger. And we don't really want to change
+the size of the objects we're considering. So partly to deal with that, we can do erosion followed by
+dilation. Okay, so here, what you can see is that we've got an erosion operation, the original image is
+being eroded, and then it's being dilated. And what has happened here is we've got the effects of erosion on dilation,
+the removal of noise, the removal of small bridges, the filling in of holes, all those things are still happening.
+But we're doing, well not the filling in of holes actually, but this operation is allowing us to keep the shape of the objects that we were considering,
+but to get some of the advantages in this case of erosion.
+So, as I've said, it removes noise, removes narrow bridges, and roughly maintains the region size.
+It also has the effect of smoothing the shape somewhat, so that the outside of the shape wouldn't be quite as jagged.
+The other thing to bear in mind, which I didn't say when we were looking at erosion and dilation,
+is the structuring elements don't have to be three by three. They can be significantly bigger. So we could
+have a five by five or seven by seven structuring element, and that means that we have a larger impact
+on the way in which we change the shape, so we can do effectively more smoothing.
+Almost the opposite to that is closing, and in closing we do a dilation followed by an erosion.
+And in doing that we get the benefits of dilation. We fill in small holes, we join regions which are close together.
+So you can see the image below on the left has what looks like a track of pixels, and they're joined together by the dilation.
+And then when we follow that with the erosion, they don't break apart again.
+Okay, so that's quite a nice outcome. Likewise, the small hole in the image on the left gets filled in,
+and when we do the dilation, the hole does not reappear. And yet again, it roughly maintains the region size.
+So we can see that by doing an opening, we got a lot of the benefits of erosion, and by doing a closing,
+we got a lot of the benefits of dilation. And we maintain the region size. So that's quite nice. That works quite well for us.
+Okay, so if we want to, we can combine opening and closing. And we frequently do this. So the example that's shown below,
+is that we have two people walking out of a library. And these two people, we actually are analyzing a video here,
+and we've built up what's called a background model. And the background model is the scene effectively
+without anyone in it. We subtract that from the current image, and we get effectively a difference image.
+We'll threshold that difference image. And then what we'll get is a binary image, such as the one that's
+entitled original binary image. But you can see that there's a problem. There are a lot of things
+around that original binary image that we really don't want. There are sections within each of the
+people, which have not been segmented correctly. And it's because they're quite similar to parts of the
+background. So the handrail, for example, on the stairs, is of a similar grayscale to the person's trousers.
+And likewise, the other person's display cabinet has sections which are too similar to the person
+who's walking past that display cabinet. What we can do to try and fill those breaks in, is we can do a
+closing operation. And we can see that right beside the original binary image. You can see that it's
+become a little bit more blocky, which isn't the nicest effect. And then after that, we still have some
+narrow things. So you see the vertical line to the right of the right-hand person. That's actually
+the door. The door is slowly closing behind the person. And there's just that little vertical stripe
+that we really would prefer not to have. So we do an opening operation and that gets rid of the noise.
+And hey presto, we now have two figures. We have them roughly in the size they are. They're not very
+precisely defined in terms of their outlines. But the size of the people. And if we were to analyze the
+shapes, we probably, as these figures move through the scene, we could determine that that is actually
+a person-shaped object. It's very tall compared to its width. Okay. Similar processing is being done below
+on the PCB. And you can see that we can find little breaks in the printed circuit board very easily
+using this type of technique. Okay. So one of the things I haven't talked about is isotropic
+structuring elements. So an isotropic structuring element is one which is effectively continuous.
+It's like the 3x3 mask where you have all the pixels in that are part of our structuring element.
+So there's no little gaps, little holes within that structuring element.
+It does remove small image details and you can apply different structuring elements and different
+shapes structuring elements. If you continually apply opening or closing operations, you don't
+get any change. So if you do an opening and you do another opening on the result of that, it will be,
+it will remain the same. And the same is true of closing. So that's just one of the properties you
+need to know of it, these things. And that's not true of erosion or dilation. And it's not true if you apply
+different size structuring elements.
+Within OpenCV, it's relatively straightforward to do this. So here is a simple, well, I'm showing you
+the dilate operation done twice. The first line of dilate is using a 3x3 isotropic structuring element.
+So we're going from a binary image to a dilated image using a 3x3. If you want to create other sizes of
+structuring element or even shapes of structuring element, you have to do something like the second
+example where we explicitly created a 5x5 structuring element and set all of the values of that to 1.
+So an isotropic 5x5 structuring element. And just call dilate and it's done. Erosion, very, very similar.
+It's just call erode instead of dilate. So that's nice and straightforward. And then finally, the
+morphological opening and closing operations are done in a similar manner. So we've got the
+same structuring element being created. And we just call this morphological x operation and give it a
+flag to tell us what we want to do. Okay. Okay. Mathematical morphology can also be used in grayscale and color images.
+And you can get some interesting effects by using this type of processing. It's not used extensively
+within processing that I've seen, but probably should be used more than it is.
+So what you're looking at here is a single row of an image. And I'm just showing you effectively,
+vertically, it's showing you what the grayscale is at each point along a particular column. And we've
+only got about 12 or 15 points in the column. And I'm pretending that there's a limited number of
+grayscales. So we've only got eight possibilities, well, nine possibilities. So you can have zero,
+and then you can go all the way up to white up there. Okay. So this should be 255 as a maximum value,
+but it's a bit hard to draw. And we also need to consider this in two dimensions, not just in one,
+but it's easier to visualize this in one dimension. Okay. So we're just going to do erosion and dilation
+in one dimension. So probably the easiest thing to do is just to consider the black section in the middle
+image. Okay. So in the middle image, the...
+Okay, let me explain that slightly differently. What we do is we consider every grayscale. And every
+possible grayscale, we create a new set. And the set for a particular grayscale is all points that are
+greater than or equal to that particular grayscale. So if a pixel has the value 255,
+then it is a member of every single set. 255, 254, 253, all the way down to one. Okay. So it belongs to
+each of those sets. If a value, if a pixel had a value of three, it's only a member of sets one,
+two, and three. And it's not a member of any set that's higher than that. Okay. So that means that if
+we consider an arbitrary grayscale, so let's say we consider a grayscale three, some pixels are going to
+be in that set, and some pixels are not going to be in that set. And what we do is we basically do
+erosion and dilation on each set separately. So if you look at the example, if we consider the black
+set, so look at the center image and consider the black set at the very bottom. And if we erode that,
+then if you look to the left hand side, you'll see that the black set is much narrower. And in fact,
+the two pixels in the black set have disappeared, the ones on the right hand side. If we dilate it,
+and go from the center to the right hand side, you'll see that the black set has expanded out,
+and filled in some of these little white holes in it. Okay. We're going to do this on every single
+grayscale. Right. And that's what our erosions and our dilations are doing on each of these sets.
+So the output looks something like this when you do it on a real image, when you do it on a two-dimensional
+image. It effectively spreads out the brightness at every single point within the image, and creates
+quite an interesting impact on the image, which could potentially make further processing a little
+bit easier. We can also do this on color. And here's the output on the color image. So this creates
+some nice graphical effects and potentially might be useful to do further processing. Depends what it is
+we want to do. With the color images, what we're doing again is one set per gray level. But we're also
+doing it one set per gray level per channel. So we end up with 255 times three sets. And we do our
+erosions and our dilations on all of those sets separately. And that gives us the result that we're
+seeing.
+Mathematical morphology can be used to find local maxima and minima. And it's something that we often
+have to do, particularly in the recognition domain, we want to see when something best matches. So we
+will do computations where we try something at every single point in an image, and we might compute a degree
+of fit, how similar is this part of the image to something that we're particularly interested in.
+Okay, so we end up with an image, which effectively has degrees of fit. And so we frequently would like to know
+what the local maxima or local minima are within this. So just considering local maxima, the way we do this is,
+we look at our image, and we dilate the image. Right, so if you look at the sort of the flowchart down below,
+we're still working with a single dimension. So we're just looking at a single row of this image.
+We're doing a dilation on that. And then we're comparing the values of the dilated image with
+the original image. So you'll see the section where it says equal to original. And you'll see there are two
+points, two different image columns, where they have exactly the same value in the dilated image as they
+had in the original image. Okay, then what we do is we take the original image again and we threshold it.
+So in this case, we've thresholded it at about the halfway mark. And so five pixels here are
+above our threshold level. And then we combine those two things together. We add those two things together.
+And by adding them together, we get high local maxima. So it's only that left-hand local maxima,
+which is higher. So we don't necessarily want the other one if it's below our threshold value.
+So we're going to do that. In OpenCV, that's relatively straightforward to do. We do a dilation,
+as we did before. We do a compare operation. You'll see there's a flag which tells you whether
+the compare you're doing gets things that are exactly equal. And there's other options in there.
+We do a threshold then of the original inputted image. Okay, there's a conversion going on there to
+make sure we're looking at the same thing. And then we do a bitwise and and we get our output.
+And that will do it for our two-dimensional image. And we can then find our local maxima. So this is
+really quite handy. And this makes our life much, much easier. And it's not in what you might think as
+traditional image processing domain. But anytime we have a two-dimensional array of values or even a
+multi-dimensional array of values, these types of techniques are incredibly useful.
+So that's the end of binary image cleaning. And it's primarily a look at an area of mathematical
+morphology. The area is significantly bigger than what you've seen here. So this is just to give you a
+basic introduction to the area. And they are techniques that are used extensively in order to
+clean up binary images. Because binary images are rarely very clean. Particularly if they've come
+from background models. But also if they've come from any other image. Because images inherently have
+noise in them. So thank you very much for listening.

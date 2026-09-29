@@ -1,0 +1,267 @@
+This final session in the images section of the course looks at noise and smoothing.
+So the earlier two sessions looked at how we create an image.
+So we've got the simple pinhole camera model, the sampling and quantization, which create a basic digital image.
+We moved from there and we started to look at color images.
+And color images can range from RGB to HLS. So they're just different representations of the same information.
+And they make certain information more and more explicit.
+So it's easier for us to deal with concepts that you and I understand as humans if we look at HLS image.
+And so we often use that type of representation when we're trying to describe the contents of an image.
+For example, the color of a person's clothing.
+Color images also have sampling and quantization.
+So they're split into individual pixels and each pixel has a value from 0 to 255.
+Or in the case of a color image, it has three values with numbers ranging from 0 to 255.
+Assuming that we have 8 bits per pixel.
+Some images will have significantly more bits per pixel.
+And some images may have more than three channels.
+So if we look at satellite images, for example, we could have images with 100 different channels of spectral information.
+And we need to come up with techniques which allow us to analyze those complex images.
+We will have a look at one of those techniques later on in the course, a technique called principal components analysis,
+which allows us to analyze what the most important information in a signal is.
+And clearly when we're getting to things like satellite images, that's what we need to do.
+So returning to the subject matter of this session, we need to look at noise and we need to look at how we may attenuate that noise.
+Ideally remove that noise, but realistically we cannot be sure that we're removing the noise.
+Most images that we see have noise, right?
+So certainly if they're acquired from just a regular camera, there's an inherent amount of noise in those images.
+That noise degrades the image.
+It makes it harder to process, harder to understand.
+And we need to ensure that that noise doesn't affect our processing in a significant way.
+So we don't want to take two images of the same scene where nothing has changed and come out with a different result
+just because there was a slight amount of noise within the scene.
+And that is quite feasible. It often happens.
+So we need to develop a processing which is robust to noise.
+Okay, so the causes of noise.
+Noise can be caused by the environment.
+Noise can be caused by the imaging device.
+It can be caused by electrical interference.
+It can be caused by the digitization process.
+And there's loads and loads of other reasons.
+And they're all very small and they can all add up.
+If we take a satellite image, it could be caused during transmission.
+Right?
+And we do things to try and ensure that those transmission issues are dealt with.
+Okay, to measure noise.
+So the engineers amongst you will be very familiar with the signal to noise ratio.
+And the ratio is very straightforward.
+It's the signal that we've received divided by the amount of noise.
+So both of these terms are squared, obviously.
+And that gives us our signal to noise ratio.
+So the higher this is, the better.
+Ideally, we'd like no noise.
+Okay?
+Okay?
+And we want to somehow remove that noise and be left with only the signal that's the noise.
+There are two types of noise.
+And those types of noise are Gaussian noise and salt and pepper noise.
+Gaussian noise is the one that we see most frequently.
+And it is a form of noise where a value is being added or subtracted to the current pixel according to a Gaussian distribution.
+Okay?
+At least that's how we model it mathematically.
+It is representative of the noise that you see in most camera systems.
+You don't see an awful lot of noise.
+So you may not perceive the fact that that noise is present.
+But it most definitely is.
+The other form of noise is salt and pepper noise where you effectively get white and black points within the scene.
+So maximum and minimum points within the scene.
+To correct noise within the scene, what we typically do is a type of smoothing operation.
+So we look at our scene and we look at the neighboring points to work out what the value of a particular pixel should be instead.
+The more noise there is, the less likely it is that this smoothing of whatever form it takes is likely to correct the noise or likely to remove the noise completely.
+So let's have a look then at some of the different types of noise.
+So here we are with salt and pepper noise.
+And so the points that are being affected by noise are either maximized or minimized.
+Now I've shown one for a color image.
+I've shown one for a black and white image of the museum building on the bottom left.
+So you can see that here.
+These are our original image in color and in grayscale.
+And here we've added random noise to those images.
+We have an example where we increase the amount of noise.
+So I'm going to go to a full screen video here and play it for you.
+And all that's going to happen is as we move through, random noise will be added with an increasing percentage.
+So the higher this percentage becomes, the less likely it is that we'll be able to recreate the original image from this.
+Although if we have many images which are affected by random noise, we have a much higher chance of recreating the original image.
+Okay, the other type of noise is Gaussian noise.
+So this is the one which is in a way more common.
+So if you look at the museum images again, what you'll see is a relatively large amount of noise that's been added to it.
+And you can sort of see this type of random noise in a low quality webcam or something like that.
+You won't see this degree, but I'm overemphasizing here.
+Again, we have a video.
+This is Gaussian noise.
+So starting with a standard deviation of five and then slowly increasing that and increasing the amount of noise effectively.
+So the number of grayscales that are being affected for each pixel.
+And the higher the standard deviation, the more the impact of the noise.
+Okay, to remove noise, we apply an operation called smoothing.
+And there are both linear and nonlinear transformations that we can use.
+It's probably inappropriate to use the word removing.
+The best we can do is to attenuate the noise.
+And we can't even be sure whether what we are attenuating or what we're removing is actually noise within the signal.
+So typically what we'll do is we will take an image and we'll add Gaussian noise or salt and pepper noise to that image.
+And then we'll try different techniques on that, different smoothing techniques on that Gaussian noise affected image.
+And look at how closely to the original we return.
+The issue here is that the original image may itself contain noise.
+And whether we should be removing that noise or not is clearly an open question.
+So unless we've got a completely synthetic image, we can't completely evaluate how well our techniques are doing.
+And if we're using completely synthetic images, we don't know how well that applies to real imagery.
+So it's a bit of a catch-22.
+And this is often the case within vision, that it's very hard to come up with a metric which fairly evaluates how well our techniques do.
+So we're going to look at three different techniques.
+We're going to look at local averaging and Gaussian smoothing.
+These are both linear transformations.
+And they're quite similar.
+And you can see their results look quite similar as well.
+So these are the two results here, local averaging and Gaussian smoothing.
+And then the last one we're going to look at is a nonlinear transformation, referred to as median filtering.
+So it's got a nonlinear operation.
+And you can see some effects that you might not like, particularly on the corners of the different squares or the different rectangles within here.
+But you'll also see that you get very, very consistent answers within different regions and very sharp lines between those regions,
+which you don't have on the local averaging and Gaussian smoothing.
+So you're gaining in some ways and you're losing in some others.
+All right.
+So averaging filters.
+So these are a linear transformation.
+And what we do is for every pixel within the scene, we consider its neighbors and we effectively take a weighted average of the neighboring region.
+So if you can imagine a single point in an image, and if we were just considering a three by three region, we're allowed to consider different size of masks.
+But if we consider a three by three region, then we'll be looking at the pixel itself and each of its direct neighbors.
+So here what you can see is in the local average case, we're looking at putting a ninth on each of these.
+And that will be the answer that we will get, ultimately, for what the output value should be for that individual pixel.
+So if you look at the maps, what you'll see is that this is going to be our output.
+And this one here is our input image.
+And this is our convolution mask.
+So this mask here is only defined for the three by three region.
+Everything outside of that is effectively zero.
+And the values within that three by three region are a ninth.
+So that mask is moved around the image, computing a value for every possible pixel.
+And that value then is output.
+The difference with Gaussian filtering is that we change the weights a little bit.
+And we make it look more like a Gaussian distribution.
+So we have two masks shown here, which are both regarded as Gaussians.
+So this one has a slightly higher weight in the center.
+And this one obviously has a wider standard deviation to the Gaussian.
+And so more weight on the center region within here.
+Clearly in the case of the Gaussian, we may use a larger filter to make sure that we are representing the Gaussian completely from a mathematical standpoint.
+And in fact, I have used Gaussians which have been over 100 by 100 pixels in size.
+And the other one is the same.
+So we have to do a bit of a balancing act here.
+We need to make sure that the noise effects are reduced to some extent.
+But we also don't want to damage the image data that we are actually trying to process.
+To do these types of operations in OpenCV, we are provided with very simple functions.
+So here we have a local averaging blur function.
+And we also have a Gaussian blur function.
+What I have shown in the Gaussian case is I have shown a 5x5 filter rather than a 3x3 one.
+And I have also indicated that we can specify the standard deviation of the Gaussian.
+So the 1.5 is the standard deviation of the Gaussian.
+So if we look at the outputs then from this, what you will see is we have got an image which has been affected by Gaussian noise up in the very top.
+So we have this image here.
+And the local average produced is this.
+And then the Gaussian filtered version is over here.
+Now there are lots of Gaussian filtered versions.
+And in fact, technically lots of local average versions.
+Because you can change parameters.
+You can change the size of the masks.
+And you can change the standard deviation of the Gaussian.
+So it's not the case that the Gaussian filtered one is significantly better than the local average.
+Although clearly in this case it looks a lot nicer.
+On the bottom then we have salt and pepper noise.
+And in this case when we do our local average, we still have an effect of the noise.
+It's starting to look very like the image above it, interestingly enough.
+And likewise with the Gaussian filtered version.
+So you've got to bear in mind all we're doing here is we're averaging out the noise.
+We're not trying to work out is there a noise point here and then removing it.
+Instead we're effectively averaging it into the image.
+So median filtering treats that in a slightly different manner.
+And if you look at the results, let's go straight to the results here.
+Look at the salt and pepper noise at the very bottom of the screen.
+This one here again.
+And you look at the median filtered version of that.
+The sky is perfectly clear.
+So clearly we've done something right here.
+So let's go back and have a look.
+The idea is if we looked at a 3x3 region, you have 9 values.
+If you look at the 9 values that are written here, you can see that one of those values is very high.
+And the median value is the middle value in an ordered list of the values.
+So in this case it's 23.
+If we averaged those values, as the averaging filter would have done, we would have got 47.
+So it would have had a large impact.
+The average would have had a large impact, which the median filter doesn't seem to have.
+So the median filter is, it's not being affected by noise as long as the noise doesn't shift that median value too much.
+So if we'd had, you know, 4 or 5, if we've had 5 noise values which were very high, then obviously the median would have been affected.
+But that requires significant amounts of noise before it would be affected, before the median value would be impacted.
+If you look at the Gaussian smooth version, so the Gaussian noise, sorry, not the Gaussian smooth, but if you look at the Gaussian noise version here,
+and then you look at the median filter result, we've definitely reduced the noise, but there's still quite an impact of the noise in this image that we've got in the median filtered version.
+Okay, so, the median filter is definitely what you should be using if you have salt and pepper noise.
+The Gaussian filter, well, if you've Gaussian noise, maybe the Gaussian filter or the local average might be better.
+One of the nice things about the median filter though is that it doesn't blur edges very much.
+So if you look at this image in detail, you'll see that the edges are quite sharp between regions.
+If you go back and you look at the Gaussian and the local averaging versions, you'll find that they actually do blur the edges quite a bit.
+That's not a nice effect.
+Even in the Gaussian noise version, the median filtered version is still quite sharp.
+So that's a very nice outcome.
+It does affect corners.
+So if you look at the corners at the bottom of the window here in the scene, particularly down here, very bottom, you'll see that these corners are not as sharp as they were in the original image.
+So it's blurring off the corners.
+And that was true in the example we showed on the previous screen, or earlier version.
+We can apply this operation iteratively, and that's true of most smoothing operations.
+We can keep applying it and applying it and applying it, and it will improve the image slowly but surely.
+Okay, corners are a problem and so are thin lines.
+So one of the proposals is to change the shape of the median filter.
+I don't think this works particularly well in that if you change the orientation, if the window is at 45 degrees, then the corner appears in a different location and you have the same problem.
+The main problem that happens here is if you have a corner which is sitting like this, okay, then the median filter will do okay here.
+But if I have a corner which is at 45 degrees, and therefore comes down like this and up, then I'll lose the very corner off it.
+So while this may work as long as things are aligned with the image, it won't work if the corners are at 45 degrees.
+So, you know, there's practical limitations to changing the shape of the median filter.
+In terms of computational expense, this used to be a very, very expensive operation.
+The standard version of it was order, or squared, log or, where or is effectively the size of the filter.
+That needs to be multiplied by the number of pixels as well, to be honest.
+So that's been ignored.
+But the order of processing for a single pixel is what's shown here.
+More recently, in the last sort of 15 years, two guys developed different techniques which make the processing a lot more efficient.
+For whatever reason, people don't tend to use median filtering.
+I think it's probably a much better filter than what we mainly use.
+But it's not used, it's not in common usage.
+To use it within OpenCV is a very, very simple call.
+It's medium blur and just pass it the various parameters you want, including the size of the filter.
+Okay, so I'm just going to run yet another example.
+But this time, the example is going to show you the effect of using different mask sizes.
+So what you're going to see with this image here is you're going to start seeing what happens,
+how much more damage the image becomes as we make the filters larger.
+So you'll see that we're gradually increasing the size of the filters.
+And you can see that when we get to a very large size of filter, that we are seriously damaging shape.
+You can also see though, with the Gaussian noise, that the Gaussian noise now has more or less disappeared within these images.
+Okay, in all of these images.
+But we've done an awful lot of damage to the shape of the objects within the image.
+And as we go backwards, as we reduce the size of that filter, we can reduce the size of the amount of damage that's done to the scene.
+Okay. Now, the other thing to bear in mind is that images appear in different resolutions.
+And so it's quite possible that you might have enough resolution to allow you to remove the noise before you downsize.
+Before, you know, if you start with a 2000 by 2000 image, you might apply your smoothing before you were to down sample
+to get to the type of resolution you need for whatever application you're doing.
+The very last thing I'd like to talk about within this lecture is image pyramids.
+This is something we'll come to again and again in the course.
+We frequently need to process at different scales.
+So one of the problems that we have is described as though, imagine you're asleep and you wake up and you open your eyes.
+And you see what's in front of you. You don't know the scale of what you can see in front of you.
+You don't know if there's a person's face right in front of you or if the closest thing you can see, let's say you wake up out in the field,
+the closest thing you can see is a tree that's a long way away.
+So we don't know the size of the objects we're looking at in advance.
+To be able to deal with the fact that we don't understand the size of the object that we're looking at,
+we often try and process at multiple scales simultaneously.
+And that allows us to consider things that are happening at different scales within the scene or things that appear at different sizes.
+Now, we can also do this processing at multiple scales in order to increase efficiency.
+So sometimes if we can locate an object at a very low resolution or we can locate something at a low resolution,
+we can then process at a higher resolution in a very restricted section of the image.
+So the notion of taking an image which has a high resolution and downsizing it is quite common within vision.
+And we refer to this notion as an image pyramid.
+So typically what we do is we smooth the image first and then we subsample it, typically by a factor of two.
+And that's what you can see on the right hand side.
+You can see us taking an image, making it a quarter the size that it is, so the factor of two in both rows and columns,
+and then doing that again and again.
+And that type of representation is incredibly useful to us when we're doing image processing.
+And the last thing you can see on the slide is just the call to change the size of the image according to a pyramid down routine.
+Okay?
+So that's the end of the images section of the course.
+So again, to remind you what we've done is we've looked at the simple pinhole camera model.
+We've looked at sampling and quantization to create images, so to create digital images.
+We've looked at color representations, so how do we represent single and multiple channel images,
+and how do we represent that color information within images.
+And then we finally finished off in this session looking at noise and smoothing.
+So how we deal with the noise which is inherent in almost all images, how we try and attenuate that noise.
+I'm not going to use the term remove anymore.
+Okay?
+Thank you very much for your attention.

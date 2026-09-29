@@ -1,0 +1,360 @@
+This session follows on from the session on histograms, where we looked at one and three
+dimensional histograms, and the creation of those in order to summarize image data.
+And the idea behind those is that we can analyze the colors that are present, and we can use
+those to compare different images or different sections of images, such as a person that's
+walking around in the scene, if we want to make sure that that's the same person.
+We could potentially compare the color of the clothing that they're wearing just as an
+initial way of comparing whether they're the same person.
+Today what we're going to do is look at three different topics.
+We're going to look at histogram equalization to try and enhance an image.
+Now, histogram equalization really only helps humans, it doesn't really help computers.
+We're going to look at histogram comparison, so what we need in order to determine if two
+histograms look in some way similar.
+And we're going to look at back projection, which takes histograms and uses them in order
+to allow us to identify pixels in an image which look like a particular sample set of colors.
+So that's a very, very important technique for doing different types of processing.
+On the screen now you can see an image of the campanile in front square, which is taken
+under rather poor conditions.
+I did do this deliberately.
+So I took it with a bright sky behind it, and the image has come out very dark.
+And if you look at the histogram to the right of it, so we're only looking at the luminance
+part of the histogram, it is color image.
+In the luminance what you can see is you can see some very, very dark values.
+These ones here to the left hand side of the histogram are the dark parts of the image here.
+And then over here on the right we have some very bright sections of the image which are
+primarily coming from the sky.
+Now, we are told that humans can actually distinguish between 700 and 900 greyskulls.
+I actually find this quite hard to believe, but there's various research which has been
+done primarily with medical professionals looking at things like MRIs and other medical images.
+And it's been found that these medical professionals seem to be able to distinguish this level of
+greyskulls.
+We only consider 256 greyskulls, and I have to say I can't distinguish those.
+So I don't know, maybe doctors are superhumans or something like that.
+But if we have an image like the one on the top left, or if we have any image where the
+contrast is not well spread, we have to look at how we can improve that contrast within the
+image.
+So some of the possibilities are that we could consider evenly distributing the values on all
+the channels within the image.
+There is an issue here that if we took an RGB image and we try to equalize the histogram of
+each channel, that we will actually distort the colors.
+So we have to try and avoid this.
+And in order to avoid this, what we tend to do instead is we only process the luminance channel,
+and we leave the hue and the saturation channel alone.
+So that means we don't do equalization on an RGB image or a CMY image or some such thing.
+We only want to do it on the luminance channel within an image.
+So we're either going to work on a greyskull image or we're going to work on the luminance
+channel.
+And as a result of that, what you get, so if you look at just the example on the top
+here, what you can see is that the histogram of the image on the right has much better equalization.
+Ideally, what we'd like is a histogram where all of the cells in the histogram have exactly
+the same value.
+Okay, now there's a problem when we try and equalize a histogram.
+And the problem means that we end up with little gaps.
+We end up with peaks and gaps.
+And I'll explain that in just a second.
+But if we look at the image, what we can see is that that image that we took on the left-hand
+side has been radically improved.
+Maybe not the best possible, but there are other things we could do.
+So what we've been aiming to do is we've been aiming to take this histogram on the left of
+the luminance channel.
+And we've been aiming to create a histogram here which is flat.
+Now it's argued that our ability to recognize or to distinguish grey levels is best in the
+center, right, so in this central section here.
+And we're not very good at recognizing or distinguishing grey levels that are very low or grey levels
+that are very, very high.
+So that instead of aiming for a straight across distribution, what we should have aimed for
+instead is some sort of a normalized distribution.
+Okay, that gave a little bit more emphasis to the center of the luminance histogram.
+But putting that to the side, so there's definitely things that we can improve.
+Putting it to the side, what you can see as the output here is we've got loads of ups and
+downs.
+Some very big peaks and then some gaps and more peaks and gaps.
+And what happens if we consider the example on the very bottom of the page here, I've got
+a very simple histogram with 18 different possible grey levels.
+The first six cells within that, the first six grey levels all have three in their cells.
+And if we equalize that, what we do effectively is we spread out those cells.
+We don't take individual pixels and put them into different grey scales.
+That would be too arbitrary.
+So instead we end up with this arrangement where we have very, very distinct gaps and peaks
+between them.
+And that's exactly what you're seeing up here.
+So let's turn to the algorithm then that's used to do this.
+It's very straightforward really when it comes to it.
+So we do a little bit of initialization.
+We're considering, we're going to start going through the histogram from left to right.
+So the pixel so far is zero.
+The total number of pixels in the histogram, the total number of values, or if we add up
+all the values in the histogram, it will be the same as the number of rows times the
+number of columns in the original image.
+We go through our histogram from left to right, so from zero to 255.
+And we're obviously going to increment the number of pixels processed so far.
+And our lookup table then is based on the number of pixels that we've found so far.
+So if we've processed half of the pixels in the image, half of the total number of pixels
+in the image, we'd like the output to be around 127 or 128.
+And that's why we have them multiplied by 256.
+So we've got the pixels so far divided by the number of pixels plus one.
+We also need to recognize the plus one is there.
+We need to recognize that we cannot go to 256.
+255 is the maximum value that we can get.
+Okay.
+And then to do the application, we just go through every pixel in the original image.
+And we use the lookup table directly.
+Okay.
+So that's our equalization algorithm.
+And we can see our results yet again.
+In OpenCV, it's very nice and simple.
+We're splitting the image into a number of channels.
+So we split it into three channels.
+I'm assuming we have a HLS image to start with here.
+If we don't, obviously, we have to convert to HLS.
+We equalize the luminance channel.
+So that's channel one.
+And then we merge the channels back together into the HLS image.
+And that gives us our output.
+So it's a very nice, simple technique.
+As I've suggested, we could do a little bit better if we are aiming at improving or enhancing
+images just for human usage.
+So it gives you the idea of this type of technique and what you can do with your images.
+Maybe you'll go and take all your home photos and improve them.
+Okay.
+So that's the first topic.
+The second two topics are histogram comparison and then finally histogram back projection.
+So moving on to histogram comparison, our aim frequently, well, if we want to find similar
+images, to be honest, histogram comparison is probably not the best way to go.
+We are probably going to start off by using the metadata associated with images.
+So when you go on to Google Images or whatever your favorite search engine is, and you ask
+it to find images that are similar to one that you provide, what typically will happen is it
+will use metadata to find images.
+And there are tags that are associated with the image that describe its content.
+And in a way, that's a much safer mechanism for finding similar images.
+If you want to compare the images, you could use the color distributions.
+But you sort of have to recognize that the color distribution, the color histogram is not unique
+for images.
+It can vary hugely.
+So if I see blue, that could be the sea or it could equally be the sky.
+And obviously there's an awful lot more to it than that.
+And so color distributions are not enough on their own.
+However, the histogram comparison is probably a lot more useful when we start considering
+sections of images like those representing a moving car or a moving person within a scene.
+And so we can then start extracting attributes and attaching them to objects that move through
+our scene.
+And the colors of objects are obviously quite important to humans when they're processing
+a scene.
+To do this, we will need a metric for the comparison.
+So we need to look at various metrics.
+But before we do that, I want to show you the output of some of this histogram comparison.
+Please do bear in mind that I personally think it's not the most useful technique for comparing
+images, but it's incredibly useful for comparing sections of images like people moving through
+the scene.
+So here we are comparing images.
+And the image that you can see on the top left of the museum building, it's the one that's
+being compared.
+So surprisingly, or not surprisingly, the metric is perfect.
+So we've got exactly the same histogram because it's exactly the same image.
+And then showing some other images from an incredibly limited data set of images, about 20 images
+were used here to do the comparison.
+This image has come out to be relatively similar.
+78% similar to the original image.
+Just by comparing the histograms.
+Now clearly the blue sky is matching to some extent.
+And the building itself is then matching to here.
+There's no grass to be compared.
+Possibly this tree is getting matched a little bit to this truck.
+And then again, over here we have blue sky.
+We have building color again.
+And we have something that's a little bit reddish.
+So again, we get quite a good metric.
+But you can see the variation in these images is quite large.
+And then when we start to look at other ones, which are all around 70%, these are radically
+different images.
+You know, so we've got dark here and we've got a bit of blue going on.
+A little bit of white maybe is matching the clouds or something like that.
+And then likewise with the other images.
+And you can see that this is not picking up the sort of images that you'd like to say,
+these things look the same.
+But I'm going to keep reminding you that this technique, this idea works particularly well
+if we're considering objects and we're trying to make sure that we're, for example, tracking
+the same object all the time, whether it's a red car or a person wearing jeans and a white
+t-shirt.
+Okay, so here's some of the metrics that we use.
+Intersection is, well, it's effectively looking at the product, the normalized product divided
+by effectively a normalization based on each of the distributions within the histograms.
+They're all relatively easy to understand if you want to look into them in any depth.
+The intersection between histograms, what you need to note here is that if you're looking
+at cells of histograms, so let's say you take a histogram and you take the cells of the
+and you shift all the cells by one.
+So you're to add one to each greyscale.
+It's quite possible that the match is going to be incredibly poor unless the histogram is
+not noisy.
+So despite the fact that the histograms will look virtually the same, the intersection or
+even some of the other metrics may give you very poor answers.
+Okay.
+One of the mechanisms which is used quite extensively is this metric here, the Bhattacharya metric.
+And it's used particularly in a technique called mean shift, which we will be looking at later
+in the course.
+So this is just to show you how we compare two histograms using the Bhattacharya metric.
+If you want some more details of these, I just suggest you look at them yourself.
+And there's no point in me really going through the mathematics here.
+You're comparing two one-dimensional histograms to try and come up with their similarity.
+So it's nothing particularly complex.
+The other way to try and do this is to look at something called the Earth Movers Distance.
+The idea here is relatively straightforward.
+So think about having a building site and you want to move a pile of earth from one place
+to another place, how much effort is it going to require you to move that pile of earth?
+Okay.
+And it's the same idea with a histogram, whether it's a one-dimensional or a three-dimensional
+histogram.
+The Earth Movers Distance solution to this is to effectively look at how much it costs to
+move each cell to the other cell.
+So we have an initialization condition here.
+So Earth Movers Distance minus one.
+This is just so that we can have this index here.
+It's equal to zero.
+So the Earth Mover Distance is equal to the Histogram one of cell I, so we're starting
+off with location zero, minus Histogram two, and then add together the Earth Mover Distance
+of the previous cell.
+Okay.
+And at the end, we're going to sum these up.
+The best way for you to understand this is to look at an example.
+So here we have two distributions in Histogram one and Histogram two.
+And they're very, very slightly different.
+So I've altered the distribution here.
+You'll notice that it's slightly different here.
+You'll also notice that this part here has shifted over.
+One of the occurrences has actually been shifted up to here.
+And then this distribution has been changed so that it's split into two different cells.
+So they're very, very similar Histograms.
+So what we hope is that the Earth Mover Distance wouldn't be too large.
+The way the computation is done, so we started off with the minus one being zero.
+And then because Histogram zero and Histogram zero, these two cells are the same, there's
+no change in the Earth Mover Distance.
+Same happens here.
+They've got the same value, so there's no difference.
+And the first time we get a difference is when we hit this cell here.
+So this has eight and this one has four.
+So Histogram, so eight minus, sorry, eight plus zero minus four is going to give us a value
+of plus four.
+The next two cells are exactly the same.
+So this is six plus four minus six.
+So again, we get a four.
+And then the next two cells, we have a four in Histogram one and an eight in Histogram
+two.
+So we get a four plus four minus eight, which brings us back to value zero.
+Okay.
+So to shift these cells into these cells effectively cost us 12.
+Okay.
+It's this, this summation here.
+And then when we look at this change here, we've got a minus one.
+So Histogram two is a bit bigger than Histogram one.
+So this is minus one.
+The minus one carries where the cells are the same.
+This is a zero and this is a one.
+So it becomes minus two.
+This is a two and this is a one.
+So it becomes minus one.
+And then eventually we get back to zero again.
+So we have a few more zeros until here where we have an eight for Histogram one and a four
+for Histogram two.
+So that difference then becomes eight plus zero minus four.
+So we get a four in here.
+And then we have a zero plus four minus four.
+Okay.
+And that gives us our overall Earth Mover distance by summing all these values here, summing the
+absolutes of all those values.
+And that gives us a value of 21, which is a relatively low value for the Earth Mover distance
+here.
+So we need to look at other ones to work out what it means in total.
+But you can see that to shift the cost of shifting this into this was four.
+And the cost of shifting this part into this part here was 12.
+And the cost of shifting between this distribution and this distribution was just five.
+So they're very, very small values.
+You can imagine if this Histogram was being compared to one where it was dominant over here, that
+the cost would be significantly higher.
+We can do the same thing for a 3D Histogram.
+It's just a lot more complex to do it because we have to be a little bit more clever about
+the way in which we apply our algorithms.
+It's not in any way as simple.
+Okay.
+So our Histogram comparison then in OpenCV is quite straightforward.
+We would normally normalize the Histograms that we're using first.
+So the overall value is one.
+And then we just compare them using this compare hist routine.
+And we can ask it to use one of our metrics that are predefined.
+Or we can use a separate function, the EMD function for the EarthMover distance.
+Right.
+So that's the end of Histogram comparison.
+And the only thing we have left to do today is look at Histogram back projection.
+So this is an approach to selecting colors.
+So if we look at the example on the right here, here's an image of two people.
+And we want to select out the skin pixels.
+To do this, we need to have some knowledge of what skin pixels are.
+So we've got a sample image up here of loads of different sections of skin pixels taken
+from lots of different images.
+And then we are going to do something with this.
+We're going to use that together with the original image to look for the probability that
+pixels in here are skin pixels or not.
+So the output of our Histogram back projection is going to be effectively a probability image,
+which gives us the likelihood that every point in the image is a skin pixel or not.
+So our first thing to do then is to obtain a representative sample set of the colors.
+So this is our sample image here.
+This is not a big enough sample.
+No question.
+This is not a big enough sample to do skin pixels in general.
+But it gives you an idea of the sort of thing that we might want to do.
+We histogram those samples.
+So we put those samples into a three-dimensional histogram.
+And having done that, we're going to normalize that histogram.
+So we have a maximum value of 1.
+And we use that histogram to back project an image.
+So the idea is very straightforward.
+We take any pixel from here.
+So let's say we take this pixel right here.
+We look at the histogram that we created in here.
+We take the value here.
+Now remember the histogram is a three-dimensional histogram.
+So let's say we're in RGB space.
+And in RGB space, we have a three-dimensional histogram.
+So if we have a pixel that has an R and a G and a B value, we can work out what value that
+corresponds to within the histogram.
+The value in the histogram is, in effect, the likelihood that one of these sample points
+was, sorry, that that particular RGB value corresponds to skin pixels from the sample set.
+And that gives us, in effect, a type of probability image, which measures the, or gives you the similarity
+between any particular pixel and the original sample set.
+We might actually need to do a little bit more if the sample set is not full enough.
+So we need to make sure that the distribution that's within the three-dimensional histogram
+that we're using to do the back projection.
+We need to make sure that that's constant, that it's continuous, that we don't have little
+gaps within it.
+And so there's a little bit more to this technique than meets the eye.
+But the idea is sound.
+The idea is that we take a sample set, create a histogram.
+We may not have, you know, we may quantize that histogram.
+We might only have a limited number of bins.
+We take each pixel in the original image.
+We work out what value that corresponds to in the normalized histogram.
+And that value then is the probability for that pixel that it might belong to the sample
+set.
+Okay?
+That it might be, in this case, a skin pixel.
+And here it is in OpenCV.
+So in OpenCV it's relatively straightforward.
+We compute our histogram as we've done before.
+We normalize our histogram.
+And then there's the back projection routine.
+Do remember that you're not getting a binary output.
+So you may want to threshold this at the end of the day, depending on what you're trying
+to do.
+So there's a little bit more to this.
+This does not just sit on its own.
+It's not a, if you like, a complete technique on its own.
+So today what we've done is, or at least in this session, what we've done is we've
+looked at histogram equalization, which is a technique for enhancing images, primarily
+for human usage or understanding.
+We've looked at histogram comparison, which I tried to emphasize is not particularly useful
+if you're considering a whole image, but may be particularly advantageous if you're comparing
+sections of images.
+So if you're comparing objects that you've segmented out of an image, like people or cars,
+them, that comparing their colors is particularly useful.
+And then the last technique we've looked at is this histogram back projection, which is
+how we select out specific colors from an image.
+Thank you for your attention.

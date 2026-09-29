@@ -1,0 +1,324 @@
+This session is the second in the images section of this course.
+In the previous session we looked at the simple pinhole camera model,
+and we looked at sampling and quantization of images.
+We restricted ourselves to considering grayscale images,
+and grayscale images are images where we have a specific number of rows and columns,
+so a specific number of pixels,
+and also we only have a single value per pixel, so a single value per point,
+typically with 8 bits, so 256 possible values per point.
+Normally this represents luminance. It can represent anything,
+but when we're looking at images that you and I are used to,
+we would be considering luminance,
+but it can represent any quantity we want it to represent.
+We know that we can understand grayscale images,
+so when you look at an image like the one that's up here,
+you recognize that this is grass, you recognize that these are plants,
+you recognize that this is a building,
+and you can see the sky, you can see some people walking here,
+although they're a little hard to distinguish with this resolution of image.
+For a long time in image processing, we believed that grayscale was sufficient,
+and we probably believed that largely because we wanted to make the computational task easier.
+The issue for us in the early days of vision was that it was very hard to process images,
+and when I started working in vision, which is way too long ago,
+but let's say over 30 years ago,
+it would take around an hour to an hour and a half to process a small single grayscale image.
+So typically what you did was you started the processing run,
+and you went off and you had a long lunch, and you came back to find out how it did.
+So you were a lot more careful about the way in which you did algorithm development.
+And that influenced our approaches to vision,
+that we knew we could only process at certain speeds,
+so we only considered grayscale images.
+We tried to avoid color because that introduced more and more complexity.
+We also avoided video in the early days of vision.
+When it comes to it though, color images provide a lot more information.
+So when we look at the image on the right here,
+it's a lot clearer to us where the grass is and where the sky is,
+and we can even distinguish individual plants based on their slight differences in their coloring.
+This lady here seems to stand out very nice and clearly
+because her coat's a different color to the other ones around her.
+So the image for us, it's much, much easier to understand,
+and one assumes we can develop algorithms to work on a computer,
+which will make it easier for them to understand.
+Color images typically have three channels.
+And the one that we would be most used to is the red, green, blue images.
+We see those on our monitors all the time.
+You'll often see red, green, blue connectors.
+But what those color images consist of either explicitly or implicitly is a combination of luminance and chrominance.
+So luminance is the brightness information and chrominance is the color information.
+If we do have three channels, and most color images do have three channels,
+then if each of those channels has 256 possible values,
+we have around 16.8 million possible colors within our image.
+And clearly that's a lot harder to process and to deal with
+than the 256 grayscales that we had in the grayscale image.
+As I said before though, this type of image probably facilitates certain operations.
+It is much easier for us to segment out the sky there.
+It looks like it's a nice consistent blue color,
+so that we can recognize where the sky is,
+we can recognize where the grass is, primarily based on color.
+So here's an example of processing a color image.
+And I'm only showing this to you in order to give you a sense of that type of processing.
+The biggest difference, the thing that's most important is this for loop here,
+where we're going through the individual channels.
+So for each row and for each column, we're now considering each channel.
+And we're doing processing in order to create an output image from the input image
+at a particular row, column and channel.
+The processing here is just inverting the image, so it's doing 255 minus whatever the value is.
+The other thing then is up at the top we have a CV assert,
+which is saying that it's 8 bits per channel and that it's a 3-channel image.
+So that's our typical color image.
+And we don't really mind at this point as to which type of color representation we're using.
+Now, these nested for loops are not particularly efficient.
+And so when we start to look at doing image processing in real time,
+we often have to look for more efficiency.
+But more efficiency comes with a cost.
+It comes with the cost of making it very hard to understand what's going on within the images.
+So I'm showing you this code.
+I'm not encouraging you to write code like this, but it will be an awful lot faster.
+It's using pointer arithmetic and such things to make the system do the processing in a faster manner.
+I would encourage you to use the previous type of code instead.
+Okay, so what I want to do now is I want to look at a number of different color representations which are common.
+And we'll finish off this section with a description of a few others.
+There are tens if not hundreds of different color representations.
+And they're all equivalent.
+Most of those representations allow you to convert in both directions.
+So you can convert from RGB to HLS and back again.
+And you shouldn't lose significant information.
+You might lose a little bit through quantization depending on what sort of transformation is happening.
+But it would not be in any way significant.
+So let's start with the most common representation, which is RGB images.
+And what we're looking at here, this in some ways comes from the camera itself.
+So many photosensitive cells within a camera will be photosensitive to colors around red,
+colors around green, and colors around blue.
+And we would combine those different photosensitive images together, if you like,
+in order to create a red, green, blue image.
+So let me show you what I mean.
+So you've got an RGB image on the bottom of your screen there.
+These are the component images.
+The red, the green, and the blue component images.
+So if you look at this, what you'll see is that this image on the top right here is the red image.
+Okay?
+These are the red balls here.
+And there's a pink ball as well.
+This one here is brown, so it has quite a strong red component to it.
+As does skin, it has a very, very strong red component to it.
+The one on the bottom left here is the green image.
+So this is the green of the cloth of the snooker table.
+And then this one over here is the blue image.
+This is the blue ball here.
+Okay?
+So it's got a very strong response in the blue channel.
+And it's got a response as well to the table because it's, the tablecloth is a bluey green,
+or a greeny blue, I don't know which way you want to put that.
+Okay, so the different channels have different photosensitivity.
+So if you can imagine, within a camera you have photosensitive elements.
+Those photosensitive elements are not photosensitive just to a single wavelength of light.
+They're photosensitive to a range of wavelengths.
+And those ranges of wavelengths are described by a spectral sensitivity curve.
+And therefore, a camera will have three spectral sensitivity curves.
+One for the pixels which are photosensitive or described as the red pixels.
+One for the blue pixels.
+And one for the green pixels.
+You can see the photosensitivity of the green channel seems to go across most of the visible spectrum.
+Okay?
+And that's why this image, the green image, will typically look quite like a grayscale image.
+When we take these three images and we combine them on the monitor, we get back to this image here.
+Right?
+And we do not think about the fact that there are three components to that image.
+We just see a color image.
+If we want to convert to grayscale, it's a very, very straightforward transformation.
+And it's just a weighted sum of the red, the green, and the blue channels for each pixel separately.
+You'll see that there's quite a strong weight on the green channel.
+But we've already seen that the spectral sensitivity curve for green is very like the grayscale.
+It covers most of the spectrum.
+Now, this formula that you're being shown is one of many.
+And in theory, this formula would change depending on the camera, depending on the photosensitivity
+of the different elements within the camera.
+So there are many formulas for converting from color images, from RGB images, to grayscale.
+Okay, so we've already talked about the fact that there are separate red, green, and blue elements within a camera.
+And sometimes there are elements which are sensitive to all visible wavelengths.
+So they're effectively grayscale.
+So they're sensing grayscale directly within the camera.
+In most color cameras, we use something called the Bayer pattern.
+And this is the Bayer pattern where we've got a layout of photosensitive elements.
+So what you can see here is that every second element is green.
+So every second element is photosensitive to green pixels, if you like.
+It's photosensitive to the spectrum centered around that green wavelength.
+Okay.
+And then every fourth pixel is red and every fourth pixel is blue.
+And those are combined together when we're creating an image that we present to the user.
+Now, there's something strange going on here.
+Because clearly we don't have red, green, and blue values for every single pixel in the image.
+Instead, we have red values only for every fourth pixel in the image, and likewise with blue.
+And we have green for every second pixel in the image.
+So if I was doing this, what I'd do is I would say, okay, this looks to me like it's a four by three.
+There's four times, there's four patterns going across, there's four reds going across and three reds going down.
+So what I should do is I should create an image with four pixels by three pixels.
+I believe that what happens when we look at a camera, so somebody sells a camera, they're not going to tell me this camera has 12 pixels.
+Instead, they're going to tell me that this camera has 48 pixels.
+And they're going to interpolate values for the green, the blue, and the red for every single pixel.
+So the information you get back when you get a JPEG image or you get any image back from your camera is interpolated.
+There's an awful lot more going on than you seem to think.
+So what you're receiving in from your camera signal, don't necessarily trust it.
+You may be getting something that's already been interpolated.
+Here we are with an RGB image.
+And what we've got, in fact, so I've written it the other way around, I've written BGR.
+So for some reason, which I've never got to the bottom of, images in OpenCV are stored as blue, green, red images.
+So the channels are stored in that order rather than in the other order.
+Okay, so just to give you an example here, what I'm doing is splitting this BGR image into separate images.
+So the three separate channels.
+And then I can effectively process the blue image or the red image or the green image separately, if I so wish.
+Okay, another representation which is very common is the CMY representation, which is cyan, magenta and yellow.
+And this is a representation you have probably come across before because it appears in printers.
+These are the secondary colours.
+And the secondary colours, effectively, it's, we call it the inverse of RGB.
+Because all we're doing is cyan is red, is 255 minus red, magenta is 255 minus green, and yellow is 255 minus blue.
+And these are the secondary colours.
+So the reason that this is a subtractive colour scheme is, the way that it works is if you start with white, you effectively subtract off white to get to black.
+On RGB, what you're doing is you're starting with a black screen and you're building up towards white.
+So maximum red, maximum green and maximum blue, and when combined together will give you the perception of white.
+And in a printer, we're typically printing on white paper.
+So we're starting with white and we have to go backwards.
+So we use a subtractive colour scheme, cyan, magenta, yellow.
+Now, from a computer, because the transformation is so simple, this is not a type of image that we typically process on a machine.
+We only use it within printers.
+And for that reason, there's no direct support of CMY within OpenCV.
+Right, moving to a representation which separates the luminance and the chromance components of the image.
+And what you will see here is the YUV image.
+So this is a YUV image.
+This is a colour image.
+All colour images are the same.
+So when shown to us, they will appear identical.
+OK, so this could be RGB, this could be YUV, whatever.
+But the components that make it up are somewhat different.
+This is the Y component.
+This is actually the grayscale, the luminance, if you like, of the image.
+And then at the bottom, you have the YUV and the V components, which in this case are chrominance components.
+And there's no obvious explanation for what YUV and V are.
+You can have a look, if you like, at the formulas that do the conversion, and you can come up with some sort of description if you wish to.
+But I just regard these as luminance components.
+YUV is very well known because it's used within analogue television signals, such as NTSC and PAL.
+And one of the things which is interesting when you start looking at television is that television was really worried about human perception.
+And in the early days, it was particularly worried about the amount of information that had to be carried.
+So they spent a lot of time looking to see how they could reduce the amount of information that was being transferred.
+And what they discovered was that from a human perception point of view, that luminance matters an awful lot more than chrominance.
+And so despite this being split into three channels, two thirds of the bandwidth was given to the luminance.
+So there were four bytes of Y to each one byte of U and V.
+So a third of the information was given to chrominance and two thirds of the information is given to luminance.
+And what's been found from a psychological point of view is that humans seem to have this ability to lock the colour to the luminance boundaries.
+And they'll ignore any colour that sort of slips over a luminance boundary.
+And therefore, we can do this difference in resolution when we're transmitting images and we can get away with that.
+So we don't tend to use YUV in our processing, although I'd have to say there are quite a number of research papers that do use this type of representation.
+The one I like the most is the HLS representation.
+So this is the hue, luminance and saturation representation.
+So the luminance is our brightness. It's a grayscale image again.
+And then the two chrominance components are hue and saturation.
+So when we look at this, we have three possible values here.
+We have hue, luminance and saturation.
+So let's have a look and see which is which in the images that we have below.
+Well, the one on the top right should be reasonably clear to you that that's the luminance.
+It's very like the luminance that you saw before from YUV.
+So the other two are the hue and the saturation.
+So here is a representation of HLS space.
+So it's a three dimensional space.
+And it's described in this strange looking cone.
+What you'll see is that the hue is a circular representation.
+Typically it starts at red, which has a value of zero, and goes all the way around the various colours, yellow, green, blue, dark blue, pink, or magenta probably.
+And back to red again.
+Okay, so that's going from zero all the way around to 255.
+The way I've described it here, I've said it's going from zero to 360 degrees.
+So it really depends how you scale it.
+And in fact, when we look at OpenCV, the values range from zero to 179.
+So that's obviously 360 divided by 2 minus 1.
+The luminance is what you saw before.
+It's running from zero to 1.
+They describe it as zero to 255 is what it's more than likely going to be represented as.
+And saturation is the distance away from this central axis, which is between zero and 1.
+So colours that are very full are going to have a high saturation.
+And values that don't have an awful lot of colour associated with them are going to have a very low saturation.
+So if we go back to our image then, what you'll see is you've got an interesting ball here and interesting balls here.
+The red balls have both black and white.
+And that's because they're represented both as zero and as the maximum hue value.
+So you have to be really careful with this hue image because the values are effectively circular.
+And the difference between zero and 255 is actually one.
+OK, there's only one hue value between those two hue values.
+The last image here on the bottom right is the saturation.
+And this is a pretty saturated image.
+There's an awful lot of colour in this image.
+So the saturation values are generally quite high.
+OK, the conversion from RGB to HLS is a slightly complex conversion.
+You don't have to learn this off.
+But I needed to show it to you just to show you that there is a simple way,
+relatively simple way of converting between the two representations.
+And fortunately for us, OpenCV provides you with that conversion.
+OK, so in OpenCV your luminance and your saturation range from 0 to 255.
+Your hue ranges from 0 to 179.
+OK, the last thing we want to do here is look at or at least mention a few other colour spaces.
+I don't need you to learn all these off.
+The most important ones that you know are RGB and HLS and probably greyscale images as well.
+OK, so HSV is hue saturation value, which is very similar to HLS space.
+But the definitions of the individual channels vary a little bit.
+Sorry.
+YC or CB is a scaled version of YUV, which is often used in image and video compression.
+XYZ is a representation, a standard reference for, sorry, is the standard reference colour space,
+where the channel responses are similar to the different cone responses in the human visual system.
+CIE is the Commission Internationale de l'Eclairage.
+So it's the International Commission of Illumination.
+And so they provide some of the definitions for the various different standards.
+CIE also defined the L star, U star, V star representation, which is another standard colour space intended to provide a perceptually uniform colour space,
+where the difference between individual colours are proportional to our perceived differences.
+They also provide L star, A star, B star, which is a device independent colour space that includes all colours that can be perceived by humans.
+Believe it or not, RGB does not encompass all possible colours.
+Although I would have a hard time describing the ones which are not encompassed.
+And the last pattern is what you saw before, and it's what's used in CCD sensors, so in photosensitive devices.
+And if we have raw sensor data, it's going to be represented within this type of pattern.
+So a lot of cameras, a lot of high-end cameras will allow you to download the raw sensor data, rather than giving you this interpolated data that we've talked about already.
+So that's the end of colour spaces, so colour images.
+The ones that you really need to remember are the RGB and the HLS space.
+And pay particular attention to HLS that the hue space is circular.
+And so a lot of the operations that we do in vision cannot be applied directly to the hue space.
+And we either need to convert into RGB space and do the processing in there and then convert back,
+or we just need to do something adaptive and apply a slightly different operation to the hue space.
+Thank you for listening.
+OK, one little issue was missed when I was recording the lecture initially,
+and that's to describe some of the issues that we have when processing HLS images.
+So this small section has been just tagged on to the end of the lecture.
+The HLS model has some areas where it has a bit of a problem.
+Specifically, if you have very low or very high luminance,
+so if you have values which are close to black or values which are close to white within the model,
+the result of this is that the hue and the saturation values are almost meaningless.
+So when we're processing an image, we actually can't assume that we have a hue and a saturation value
+for every point within the image.
+We first have to check to see if the luminance value is very high or very low.
+If we don't do that, then we're effectively getting noise added in in terms of the hue and saturation values,
+which is not a good way to do our processing.
+So processing HLS images has a number of issues.
+One is the circular hue, and then the other issue that we have to consider is if we have very low or very high values of luminance.
+We also would have a slight issue if we have incredibly low values of saturation.
+The hue value associated with those would also be almost akin to noise,
+because there's no real colour present, and it would be very easy for the colour, the hue, to change
+with a low value of saturation.
+OK.
+So, let's see.
+
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.
+Let's see.

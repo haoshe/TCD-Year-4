@@ -1,0 +1,277 @@
+Okay, in this session we are going to consider histograms. This is a way of summarizing all of
+the image data. We're trying to look at the image, we're trying to make a brief description, in effect,
+of the image content. Now, we're not going to care about where things are in the image, but this type
+of technique can be very useful for describing the distribution of colors and therefore for
+analyzing colors or analyzing even grayscales within images. The first few examples are definitely
+not going to show you the usefulness of this, so let's just talk very briefly about why you might
+do this. So if, for example, you were looking at a video, surveillance video, and you saw somebody
+walking through the scene, let's assume that we can develop techniques which will segment or separate
+that person from the rest of the scene. We can then create a histogram of the color distributions
+describing that person, and if we look at the different sections of the person, the top, the
+middle, and the bottom, we could potentially identify the type of clothing they're wearing. So they're
+wearing jeans, and they're wearing a black jacket, and they have gray hair. Okay, so that type of thing
+can be very helpful, and it can help as you're trying to track people through the scene, and it most
+definitely can help when you're trying to describe something to a human operator at the same time.
+So in this session, we're going to consider just 1D and 3D histograms, and then in a following
+session, we'll look at some smaller aspects of histograms equalization, which is just to allow
+users to better understand images. It doesn't really help a computer. We look at histogram comparison,
+which is a way of determining if two histograms look quite similar, and that would be particularly
+useful if we're trying to compare, you know, two instances of a person that we've been watching
+in a video. If we want to try and determine if this person looks like they're the same as the other
+person, one of the starting points might be to compare two three-dimensional histograms of their
+colors, and therefore determine if they look roughly the same, if they're wearing roughly the same clothes.
+And then the last one is histogram back projection, which is where we try and select particular colors
+out of an image. So let's say we want all the red points in an image, or all the skin pixels in an image,
+this is a technique that allows us to compute that. So moving on then, we're going to have a look at
+one-dimensional histograms. And here is a one-dimensional histogram taken of a gray level scene of a
+snooker table. Now most definitely this is not particularly useful, but it'll just give us the
+idea of what we're trying to do with our histograms. What you can see on the vertical axis is we're counting the
+number of pixels, and we're counting the number of pixels for every possible grayscale, all of these
+intensities here that we're seeing on the horizontal axis. So we're looking at the grayscales that are running from 0
+through 255, and we are looking at how many pixels in this image over here have a particular grayscale. So if we pick
+grayscale 127, then we just go straight up and we work out that that number of pixels have that particular
+grayscale in the image.
+Okay.
+So to do this is reasonably straightforward. We initialize a one-dimensional array, H. So H is going to have 256 values.
+We're going to assign each of those to 0 at the start. And then we're literally going to iterate through the image
+from the top left to the bottom right. And we're going to add one to the relevant cell of the histogram
+every time we go through a pixel. So a pixel ij will have a particular value, and we're going to add one to
+the associated cell of the histogram. And that creates our histogram here.
+Okay. So is this useful? Well, it's a very open question. Certainly in this image, it doesn't look
+particularly useful. We need to remember that it's global information. But when I say it's global,
+it may have, in this case, it describes the overall image. But in most cases, it's going to describe a
+section of an image, not necessarily the whole thing. So if, for example, we were able to segment these
+snooker balls and we were looking at a color version of the image, we could create a histogram for each
+of the balls. And then we could try and analyze if those balls were red or pink or blue or whatever it
+happens to be. So this potentially could be useful for classification if we can somehow compare those
+histograms. The histogram is most definitely not unique. It does not care about the locations of different
+colors or different grayscales within the original image that's being analyzed. So we can just jumble
+those pixels up and we will get exactly the same histogram.
+In OpenCV, it's not too complicated. There's a matrix structure which is provided, which allows us
+to represent our histograms, or in this case, our one dimensional arrays. And so we have an image,
+which is also described in this case as a two dimensional array. And here is our n dimensional
+histogram that we're going to create. We have a little bit of oddities to create. We have to tell
+it the indexes of the channel numbers associated with the image that we're going to process.
+We have to tell it the range of the possible values, and these all have to be set up in particular ways.
+And so I've provided all the code for that in case you want to use it. And it's in the tips system if
+you're using that. We need to specify the number of bins that we're using. We are going to change this
+as we move forward. But assuming we have one bin per possible grayscale, we have 256 bins. And then
+to calculate the histogram is very straightforward. It's just a call to calculate histogram. So that's nice
+and easy. And all the parameters are specified. And then finally, I've just shown some drawing of the histogram and displaying of the histogram.
+Okay?
+Now, within a histogram, the local minima and the maxima can be useful values.
+But there's a problem because if you, as you've seen from the previous histogram, a histogram is very, very noisy.
+And we have to somehow deal with that noise. Now, one of the ways that's suggested of dealing with that noise is to do some local averaging. So to smooth the histogram.
+And here is a proposed way of smoothing the histogram. I'm going into this in some detail,
+primarily because it sort of affects how we process images as well. And we're going to look at some issues
+associated with smoothing this type of representation, which then become more significant when we're looking at a two-dimensional image structure.
+Okay, so here what we have is we have something where we're creating an output histogram down here below.
+And this is our input histogram up here above. So the smooth version is supposed to take the local average.
+So we'll take these three values, average them, and get an output value. And similarly, we'll take these three values and create an average here.
+So this is one possible way of smoothing our histogram. And it certainly reduces the noise somewhat.
+We do have a problem though. And that problem is what we do at the ends of the histogram.
+And you can see from the question marks I've put in here on the output histogram that it's not clear.
+Should we just take these two values here and take the average of those and put it in there?
+If we do that, we're creating a slightly different value. So if we had a normalized histogram,
+it won't be normalized after we do that operation. All right, so it's not mathematically the same.
+We could leave them blank. And in some forms of image processing, that is what it's done.
+We could wrap around. So we can take this one, this one, and this value here, and use those as the average.
+We could duplicate values. So we could take this value here, and we could stick it out here.
+Okay, so there are lots of ways in which we can do this. We could assume that it's a zero out here if we wanted to.
+Okay. The bottom line is all of these mechanisms that are described here are all used within OpenCV when processing images.
+And that may come as a bit of a surprise to you. So the boundary effects are incredibly noticeable when you do image processing.
+And you have to be really careful that the more processing you do, the more likely those effects will damage your image in some way.
+Okay. Here's smoothing as implemented. And all we've done here is just done a little local average.
+So there's nothing particularly fancy in this code.
+Okay. Moving on then, let's have a look at color histograms.
+And what we're going to do here is we're going to compute one-dimensional histograms again.
+But we're going to compute them independently for each channel.
+And depending on what color space we use, we're going to get slightly different histograms.
+So let's start off with some of the simpler color spaces.
+So here we have the color image of the snooker table.
+And here is an RGB histogram. So we've got three separate histograms going on here.
+We've got a red histogram. We've got a blue histogram.
+And we've got a green histogram. Okay. And they're all color coded here.
+So apologies to anyone who is color blind.
+And I will try and trace them a little bit just to try and deal with that.
+So the red histogram has a very large peak here at the very bottom.
+So that's indicating there are loads of points that don't really have a red component.
+And that's not surprising. There's a lot of the table which is green.
+So we wouldn't expect to have a significant red value.
+They do have red components though.
+And that's what you're seeing here at the lower part of the histogram.
+So we're seeing that. The other thing we can see. So it then goes down to almost zero.
+And at the very right hand side of the histogram, we have a major peak associated with red.
+And we assume that that's associated with these red balls here.
+And probably with this brown ball and possibly with the skin and the pink ball.
+So they are all adding to this peak in the red channel.
+And that's why we're seeing a nice strong green response.
+Nice strong green within the image.
+So we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And that's why we're seeing a nice strong green response.
+And CMY is effectively the opposite of RGB.
+And if you look at this, if you look at this histogram and you compare it to this histogram here,
+if you were to flip them horizontally, they would appear the same.
+So there's no real information to be talked about in there.
+The YUV histogram, so if you remember from your color representations,
+Y is the luminance and the U and the V are different color components.
+And to be honest, we can't really explain what those components mean.
+So that's not particularly helpful.
+Right. So we're going to consider the HLS space.
+In the HLS space, we have three channels.
+The sort of light gray channel that I'm tracing over the histogram of now
+is the histogram of intensity.
+So the luminance channel, in fact, the L channel.
+The channel here with the dark black, which has a big peak here,
+is the saturation channel.
+So most of these pixels have very strong colors.
+So therefore, we have quite high saturation as described in this section of the histogram.
+And the last channel, the HUW channel, is arguably the most important channel.
+And if we look at that, we've actually encoded it in color.
+So it starts here in red, works its way through yellow and then through green.
+There's a huge peak here at green.
+And then goes into cyan and back again to red.
+So you need to remember how the HUW space is organized in order to work out what this means.
+This huge peak that we have in green clearly corresponds to the green table of the snooker
+! On the snooker table.
+So the green cloth.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we're going to see the big picture of the star.
+So we'll look at this later on.
+It just means that histogram will have less values.
+And therefore there's less, in a way, there's less noise.
+But it makes it much easier to process if we have less values in it.
+It's obviously less precise.
+So there's a balance to be had here.
+And then we go around our three channels.
+And we calculate a histogram for each of those channels.
+Now, doing this type of histogramming, so histogramming the three channels separately,
+is not necessarily a good thing.
+And there is a problem in that channels are not independent.
+So if you have a dark red or a light blue,
+the hue and the saturation and the intensity are all related together with those colors.
+So if we look at a three-dimensional histogram,
+if we look at where points appear within a three-dimensional histogram,
+we can have points which have, say, very low values of red.
+And we can have points which have very high values of red.
+You know, so we end up with distributions at different points within a three-dimensional histogram.
+And so creating a three-dimensional histogram is a sensible thing to do
+so that we can look at the combinations across multiple channels.
+There is a bit of an issue here in terms of the number of cells that exist.
+So if we look at a three-channel, eight-bit per-channel image,
+we're looking at 16.7 million cells within the histogram.
+That's not a summary representation,
+unless the image was ridiculously big to start off with.
+That typically will be bigger than the original image.
+So we need to somehow reduce the number of cells that we have.
+So if we take this three-channel, eight-bit image,
+and we were to reduce from eight bits,
+we can reduce all the way down to even two bits per channel.
+And if we do that, we reduce the number of cells that appear in our three-dimensional histogram.
+So I'm showing you an example here of a three-dimensional histogram,
+which only considers two bits per channel in an RGB image.
+So if you look at the three-dimensional histogram,
+I'm showing you the different planes within the histogram.
+So the red axis is clearly running from here through here to here,
+and this is our maximum red value.
+Blue is going in this vertical direction,
+and green is going in this direction here.
+So black is in the bottom left,
+and white is in the top right here, the top right in the distance.
+What I'm showing you on the border of each cell is the color,
+the average color of a point which is in that cell in the histogram.
+And the center of each of these cells ranges from black to pure white.
+White means it's got the maximum values of any cell within the histogram.
+Black means it's got no response whatsoever within the histogram.
+So let's just have a quick look at this histogram and see what it means.
+Well, you can see here we've got a response to sort of greyish-white points,
+and this is probably coming from around the sign.
+We've also got a strong response here, which is some sort of a reddish color,
+and that is more than likely coming from the surrounds of this sign.
+Okay?
+We also have some dark points,
+and we clearly have some dark points here within the scene,
+both in the background and in the center of the sign for the arrow.
+And we have points which look a little bit greenish here,
+and a little bit dark as well.
+And those are coming from the foliage around the sign.
+Okay?
+So we can see that we're seeing meaning here.
+We're seeing a relationship between the image that we take
+and the cells that get a response within the three-dimensional histogram.
+And the final thing we're going to do in this particular section is we're going to have a look at the code for a three-dimensional histogram.
+Probably the main thing that's changing is this thing here.
+We're putting in the channel numbers.
+We're making a single call to calculate histogram with just the image.
+We're not separating into channels this time.
+And we have very explicitly changed the number of bins,
+we need an array indicating the number of bins, one per channel.
+And we typically use the same number of bins per channel,
+but that can be anything down to two, as you've seen.
+But it will more than likely never get up to 256 bins per channel.
+That's just too big.
+So that ends our talk on histograms.
+And we've looked at primarily one-dimensional and three-dimensional histograms.
+I'm hoping that you've got a sense that it is possible to get useful information from these histograms.
+They're summarizing what's in the image.
+But if you don't consider the full image and you only consider parts of an image,
+that can be particularly useful if you're trying to classify objects within the scene,
+if you want to work out that you've got a red car or that you're tracking a person
+who's wearing a white T-shirt and some blue jeans.
+Thank you for listening.
+Thank you for listening.

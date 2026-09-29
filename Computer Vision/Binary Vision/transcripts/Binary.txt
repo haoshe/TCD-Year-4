@@ -1,0 +1,270 @@
+In this session we're going to consider binary image processing. Binary image
+processing is where we take an image and we convert, typically a grayscale image,
+we convert that image into a black and white form so that pixels are either of
+interest or not of interest. The image you see on the right, the license plate
+image you see on the right, what we've done is extracted out the license plate,
+we've converted it to grayscale which is the image on the very top right, and then
+we've converted it into a binary form. In this case the letters are, letters and
+numbers are black and the license plate itself is white. Obviously the black
+regions are of more interest and then the image below that shows each of those
+black regions connected together so we've joined the dots so to speak. There's a
+little bit of region image processing which we will address later on within the
+course that has to happen within binary image processing. The other example shown
+of the road signs so it's a composite image showing a number of road signs on
+the top left and then if you look on the right hand side you'll see an image which
+just has red, black and white points. So what we've done here is we've actually
+tried to first of all find the red points and that's a technique we will look at
+later on. But having found the red points what we're doing is we're saying a
+point is either red or not red. We go from there and within each of the red regions
+we look to see if points are black or not black and then we create the composite
+image by bringing together the red and the white and not the white and black points.
+The two images below are showing the different regions which are being used so
+it's something we have to return to in a different section of the course but it
+can show that we can do very useful things if we can identify constrained areas
+of images. And binary image processing usually applies to things that are
+constrained. Things where we can separate objects of interest from the
+background. And you'll see that these examples that have been used are
+artificial examples. They're man-made examples but they are taken of real images.
+So there are many situations in the real world where we try and do this type of
+processing. It's also worth noting that a lot of the early work in vision and
+particularly in industrial vision was all based on binary image processing and that
+was largely done because binary image processing is very very fast. We don't
+have to process color images and the decisions that we make are much much more
+simple. So we could do that on old computers. Obviously these days we aren't as
+constrained in terms of what we do. So in this session we're going to look at
+thresholding which is converting an image from typically gray scale as I said to
+black and white. We're going to look at threshold detection. So how do we work
+out what that threshold should be? How do we decide which are the points of
+interest and which are the background? And we'll finish off this session by
+looking at a few variations on binary thresholding. Specifically adaptive
+thresholding and multi-spectral thresholding. The other session which will
+be a little bit shorter will look at cleaning binary images using
+mathematical morphology and we'll get into that in a little bit more detail. We
+don't do this in the same way as we clean color or grayscale images. We have to
+consider shape and style instead because we can't apply things like smoothing
+operations to them.
+Okay so here is binary thresholding. So if you consider the image on the right let me
+just show you a thresholded version. We've converted that grayscale image into
+black and white. And the way in which we've done this is we've looked at each of
+the image points. In this case f of ij and we've compared the image point f of ij
+with some predefined threshold t. If it's greater than the threshold we assign it a
+value of 1 the output gets a value of 1. So g of ij becomes 1 and if it's less
+than the threshold it is assigned a value of 0. Now for practical reasons we often
+assign a value of 255 instead of 1 so that it's easy to see when we display the image.
+Obviously this is only going to work for simple scenes. It will only work where the background
+and foreground can be reliably separated. So this is not something we should be doing in
+every type of processing and we need to be very very aware of that. So if we're applying binary
+thresholding we need to be careful that we were applying it in an appropriate situation.
+In the old days one of the most important things was making sure that the processing was happening
+quickly. And to do that they used lookup tables. And the lookup tables are still there but they're
+not as essential as they once were. So with a lookup table what we have is a one dimensional array.
+So one for every possible grayscale from 0 to 255. And we assign the lookup table this array and gets the value of 1 or 0 for every single possible cell within the lookup table.
+Then in order to apply thresholding we don't have to do a logical operation. We just do an assignment as is shown on the last line. G of ij is equal to an index into the lookup table.
+And the index is based on the point f of ij. So it's a little bit more efficient. And this mattered a lot within the early days of computer vision.
+We still worry about efficiency. But the efficiencies we look for now tend to be in processing videos or in processing very very large images.
+We're looking at images at multiple scales simultaneously.
+Probably the most important thing to remember about binary thresholding is that we are trying to separate whatever the objects of interest are from the background.
+And those two things must be distinct.
+And as long as they are distinct we can hopefully do processing to make them distinct within the image and make them black and white within the image.
+Within OpenCV there is a very simple call. So we pass in a grayscale, so a single channel image, and we can get a binary image out.
+In order to do that we pass it at threshold and we tell it that we want it to do threshold.
+There are various different operations that we can do on this.
+The 255 is saying that that's the value I'd like in the output image, in the binary image, for points which are greater than or equal to the threshold.
+Okay, so what we're going to do here is we're going to have a look at this scene and we're going to try various different thresholds.
+So the threshold you can see on the screen right now is where we have a threshold value of 10.
+And nearly all pixels in the image are greater than 10.
+So I'm just going to go into a full screen mode here.
+And we will have a look at this video through a range of possible thresholds.
+What we're trying to do here is we're trying to work out what the right threshold is.
+And this is incredibly difficult with this image.
+Either we have too many pixels and some of the lines in the PCB are connected.
+Or we have too few points and we have breaks in the potential connectivity of the lines on the PCB.
+When we get very high we have almost no points left at all.
+So the question that we have to address is how do we determine that best threshold level?
+How can we work out where we should put the threshold?
+One of the ways we can do this is we can set the threshold manually.
+So we just look at our image and we pick the threshold.
+We use a little slider and we pick the threshold which seems to work best.
+The issue if you are building a real system is that all images will not be taken under the same lighting conditions.
+And so the threshold will start to fail relatively quickly.
+Even in an industrial environment where the object being inspected is looked at inside a box with constrained lighting.
+The lighting changes over time because bulbs degrade over time.
+And eventually the system will start to fail.
+So we can't go with, in general we can't just use a manual setting for our threshold.
+We need to somehow determine it automatically.
+And if we look at the histogram on the right, we can see that, hmm, okay there's something here.
+We can see that there's a low point in the histogram and maybe that's where we should set our threshold.
+And there have been a lot of techniques that have been looked at over time to come up with ways of setting the threshold.
+We are going to look primarily at the technique that's used within OpenCV.
+So for the techniques that are going to follow, and as I say it will be primarily the one used in OpenCV,
+we consider an image, F.
+We take a histogram of that image.
+So we take a histogram of the value.
+So let's assume we have a grayscale image, such as the one shown.
+And we work out how many times each possible value occurs.
+So the value is running from 0 to 255.
+So we have 256 possible values.
+And we look at the frequency of occurrence, which is shown on the vertical axis.
+So that's what a histogram looks like.
+It can be much more useful to use a normalized distribution.
+And so what we're doing here when we create PG is we are taking the histogram values and we're just normalizing by dividing by the total number of points within the image.
+And that's the same as the total number of values within the histograms, because we're counting the pixels that have different values.
+So the technique used within OpenCV in order to determine the threshold is called OTSU thresholding.
+And the idea of OTSU thresholding is that it should minimize the spread of the pixels.
+Right?
+So what we want to do is we want two classes of pixel.
+We want the objects of interest and we want the background.
+And we want the smallest within class variance.
+So we want the smallest variance within the objects of interest in terms of the pixel values.
+And we want the smallest variance within the background pixels.
+Right?
+Now, what you see below is the smallest.
+So we're looking at the sigma values of W.
+So that's the within class sigma value.
+So the within class variance.
+And we're considering two things.
+We're considering F and B.
+So F is for foreground.
+And B is for background.
+And there's a weight associated with the foreground, which has got to do with how many pixels are in the foreground.
+And there's a weight associated with the background, which is the number of pixels currently associated with the background.
+And then we look at the variance in the foreground and the variance in the background.
+And that's where our variance for the within, the overall within class variance comes from.
+So we're going to do a little bit more of the math now in a second.
+But what we do is we're going to consider every possible threshold value.
+Remember that T can only take one of 256 values.
+So we can evaluate this very quickly for all possible threshold values.
+To do this computation, we only compute the histogram once and the normalized histogram once.
+Or the normalized probability distribution once.
+So this is very, very fast to do.
+We just have to do the computations 256 times.
+So the weights are done by just summing up values within the normalized distribution.
+And if you look at WFT, so we're looking at a particular threshold value, we take all the cells within the normalized distribution.
+And we sum them up from the cell T all the way to 255.
+So that effectively tells us what proportion of the histogram is associated with the foreground.
+And likewise, just below it, we've got the proportion of the histogram that's associated with the background.
+The variance values, then, on the right-hand side, what we're looking at is we're looking at each of the grayscales associated with the foreground on the top one.
+We're subtracting from that the average value, so the mu value, and we'll look at the formula in a second,
+but the average value of all the foreground pixels.
+And then we're multiplying that by the frequency of occurrence of that particular grayscale.
+And then finally, we divide that by the weight, the overall weight of the foreground.
+The same is done for the background.
+And these are just the formulas now for computing the average value of the foreground pixel and the average value of the background pixel.
+The maths, to be honest, is not that complex, but you probably need to sit down and look at it, think about the histogram that was on the previous slide,
+and work out for a particular threshold value, what is it averaging, what's the weight,
+and then how is that combined to give me the standard deviation, which is then squared, to give me the variance.
+So it's reasonably straightforward.
+When it comes to implementation, we frequently consider this as the largest between-class variance,
+just because it cuts down the computations a little bit.
+And the smallest within-class variance is the same as the largest between-class variance.
+So we're looking, in either case, we're looking for the value of t, which gives us either the smallest within-class variance,
+or the largest between-class variance.
+And that's the threshold, then, that's applied within an OTSU threshold.
+So for the PCB image that we looked at earlier, or, well, actually it's a different PCB image,
+but here is an OTSU threshold version of a PCB image.
+And you can see it's very nice and clean.
+The only places where it's not clean, well, I think we probably could have done with better lighting on this,
+to give us effectively better segmentation afterwards.
+So sometimes within industrial processes, the lighting matters hugely in order to allow the image processing to be relatively simple.
+Okay.
+And you can see the code then below in order to do thresholding within OpenCV.
+And we just add in the threshold, the OTSU threshold, to the options effectively that we're setting for the call to thresholding.
+Okay.
+Now we have the last thing we want to do within this.
+So we've done thresholding.
+We've done threshold detection.
+We now need to look at a few variations on thresholding.
+And specifically, we need to look at adaptive thresholding.
+And we are going to look at multispectral thresholding very briefly.
+Adaptive thresholding, well, actually, let's start with something slightly different.
+What you can see, the two images that you see, one is an original image.
+It's taken of a plan of an apartment.
+But it's very dark in the bottom right and very bright in the top left.
+And if you apply thresholding to that, just standard thresholding, the image on the right is what you're going to get.
+Adaptive thresholding is going to take that image on the left and it's going to divide it into sub-images.
+So I am going to show you the result of doing adaptive thresholding.
+We're going to divide it into 8 by 8 sub-images.
+So 64 little images are going to be used.
+And for each of those 64 images, we're going to compute a threshold within the sub-image.
+So we can do that using Otsu yet again.
+And then we have a threshold that works in each image, but obviously the thresholds will be different in each section.
+And so we have to interpolate between the thresholds.
+So when we're considering each pixel, we look at how far away we are from the center of the different sub-images in terms of which threshold we're going to use.
+So we'll interpolate the threshold values between those different sub-images as we move through the image.
+And the image on the bottom right there shows us the adaptive thresholded version based on that technique.
+So that's the old standard version of adaptive thresholding.
+You can see a couple of problems.
+If you look in the top of the image, you'll see two regions, particularly in the center and over to the very far right,
+where it doesn't look like the thresholding has operated correctly.
+If you go back to the original image, what you'll see is that those two regions are basically empty.
+They were basically blank paper.
+And so when Otsu tries to find a threshold, it does the best it can,
+but it doesn't recognize that there is effectively no threshold required for that because they're constant.
+And it's just a gradual change within the image.
+So we'd need to look at that and we'd need to work out what's going on here.
+In terms of the sub-images, if you were to look at the threshold, the threshold value would change quite significantly
+in those sub-images compared to the neighboring sub-images.
+And it might give us a hint that something is wrong.
+So here we have another image.
+And on the right-hand side, you'll see an Otsu thresholded version of that image.
+And in the Otsu thresholded version of the image, you can see that the sign, for example, the yellow sign on the left-hand side has disappeared.
+And the big number sign telling you which platform you can go to on the number 2 has disappeared as well.
+So Otsu is not doing so well here, but it's considering the image as a whole.
+We're going to look at using OpenCV's version now to do this.
+And OpenCV's version of adaptive thresholding is a little bit different to what we're used to.
+So here's the OpenCV version of adaptive thresholding here.
+Now, bear in mind this is being done on a grayscale image.
+It's not being done on a color image.
+The original image was color, but it gets converted to grayscale.
+And the adaptive thresholded version is on the right-hand side and is significantly better than the one that you saw before.
+The number 2 is very nicely clearly visible.
+Even the yellow sign now has good visibility in terms of there being text.
+It might be below the resolution that we can process, but you can certainly see the text is starting to appear.
+So this looks like it gives us the ability to find things that we might not otherwise find.
+You can see that there seems to be a problem similar to the one we saw in the other adaptive thresholding algorithm.
+If you look to the left of the two, you can see a sort of a square white block.
+And that's because it's within a region of constant color.
+And so no threshold can really be computed usefully there.
+So the OpenCV version of this actually compares each pixel to the average of all the pixels around it.
+So if you look at the if statement at the very top, you'll see that it's looking at a region which is 2m plus 1 by 2m plus 1.
+So in the case of the image we've done the processing here, we have an 81 by 81 region.
+And we're computing the average value of that 81 by 81 region and comparing it to the pixel value that's in the center.
+We're taking the difference of the pixel value that's in the center from the average.
+And then what we do is we compare that to the offset.
+The offset in the case of the processing we've done is 5.
+It's mainly got to do with avoiding noise, that offset value.
+So we don't want to compare with 0. We get some strange effects.
+And that gives us a threshold for that pixel.
+Okay, that determines whether that pixel is an object of interest or a background, foreground or background.
+And you can see the results are quite good.
+You have to do a bit of tuning to make sure that the size of the region you consider is appropriate.
+And it will still cause some problems.
+But it's quite a nice technique and it seems to work pretty well.
+The code to do that is relatively straightforward.
+We need to give it the block size and we need to give it the offset.
+So those are the values that you've seen already.
+Okay, and in fact in the block size in Open TV, I believe we'd actually put 81 in there and the offset would be 5.
+So the last thing we want to consider in this particular session is multi-spectral thresholding.
+Here you have an MRI image.
+And what we've tried to do is we've tried to look at this grayscale image.
+And we've tried to work out multiple thresholds in order to separate white matter, grey matter and subcortical materials.
+In fact, this is work that was done in North Carolina.
+And this is published work.
+This is, you know, it appeared in a relatively good publication.
+And you can see the classification with the red, green and blue image on the top right.
+And you'll see the thresholds which are being used, which have been found within the grayscale data for this white matter, grey matter and subcortical structures.
+Okay. Now, what I think is quite remarkable here, and it would certainly worry me if I was to be treated by these doctors,
+is that there are significant parts of these histograms that are shown which are clearly misclassified.
+So if you look at the distribution in the center, anything to the left of the leftmost red is being misclassified.
+And anything to the right of the rightmost red line is being misclassified.
+Okay. And likewise then for the other two distributions, there are sections of those distributions where the points are being misclassified.
+That's a lot of misclassification.
+So if you're going to make decisions about operations on the brain based on that level of classification,
+you're already accepting huge amounts of error, which seems incredibly inappropriate.
+So I would go back to one of the original statements, which is that thresholding should only be applied
+where we can very distinctly separate the objects we're interested in from the background.
+Okay. So that's the end of this section on binary image processing.
+We still have to look at the next bit, which is about cleaning binary images.
+But in this section, what we considered was how you do thresholding, how you compute that thresholding,
+and just some variations on thresholding.
+So thank you for listening.

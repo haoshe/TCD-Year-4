@@ -1,0 +1,221 @@
+This image session is the first of three image sessions dealing with the images section of the course.
+What we're going to do in the first session is look at camera models, specifically the simple pinhole camera model.
+And then we're going to move on and look at what we have to do to create a digital image from a continuous world.
+Once we've done that and we look at all the issues, you'll actually almost be surprised that we can do any image processing at all.
+Because the number of issues that are introduced as we create a digital image is quite significant.
+From there we have to move from simple images to colour images.
+And we need to look at how colour images are created and how they are represented within the computer.
+And their representation affects the accessibility of different types of information within those images.
+So that will be the second session, looking at colour images.
+The third session, we'll have a look at noise and smoothing.
+So smoothing is how we get rid of noise, or how we at least reduce noise within an image.
+And noise is inherently in all images that we take, unless we artificially create them.
+It's typically Gaussian noise that we have to deal with.
+But depending on where we get the noise from, or the source of the noise, it can be caused, or can create something called salt and pepper noise,
+where we get maximum and minimum values.
+So that will be the final session, looking at noise and how we attenuate that noise.
+Moving onwards then, we need to start off looking at camera models.
+So a camera consists of three things.
+It consists of a photosensitive image plane.
+So that's the image plane here at the back of this box that we're going to describe as a camera.
+And if you consider most cameras, certainly old fashioned cameras, you sort of got a sense of that box.
+And this image plane would have been the film that was being put into the camera.
+These days we're not using film, but we're using photosensitive elements.
+So effectively an array of photosensitive elements at the back of the camera housing.
+And the camera housing, obviously in the case of mobile phones, is incredibly narrow.
+It's incredibly small.
+The housing then is the box that's built around the camera system, whatever size that may be.
+And in the old days that was quite significant.
+And then the last thing, the last component is a lens, which focuses the outside world.
+So this is our three dimensional world out here.
+And points within the three dimensional world reflect light that bounces off them
+and bounces in through the lens to be focused onto the image plane.
+And if an image is not in focus, what it means is that these rays don't necessarily intersect on the image plane.
+So focus obviously matters quite a lot.
+In order to process images on a computer, we need a model for that camera system.
+And the model that's typically used is something called the simple pinhole camera model.
+And it refers back to a time where there was no lens and instead what you had was a simple hole in a box.
+And you would still get an image formed on the back of the box, upside down, of the world that was out there.
+And they were basically rays going through this simple pinhole.
+In a real camera, the lens introduces a certain degree of distortion within the image.
+And also obviously a lack of focus.
+So we have to somehow model that distortion.
+And we'll come to that distortion much later in the course when we look at geometric transformations.
+So there's a way of modelling a camera just using the simple pinhole camera model,
+then adding to that to allow the distortions to be removed, represented and removed.
+Here's our simple pinhole camera model.
+So in this model, out in the, this is the big bad world, the XYZ world, so a Euclidean space.
+And we have a three dimensional Euclidean space.
+And therefore objects out in the real world are three dimensional.
+What happens when we take a picture is that points here,
+that the light that reflects from those points, go through the simple pinhole here,
+which is at the origin.
+Typically it's at the origin of the Euclidean coordinate system.
+And they project all the way in and land upside down on the image plane.
+So we get an image of the objects that appear in the real world.
+The objects that appear in the real world are obviously described using the Euclidean coordinate system.
+So they're going to be three dimensional points.
+Okay, the XYZ points.
+And they need to be related to points on the image plane, which are often described as I and J values.
+Okay, so we have another coordinate system here, which is describing the coordinates on the image plane.
+The center axis, the optical axis effectively of the camera, intersects with the image plane virtually somewhere.
+And that's described by the center point, these CICJ.
+Okay, so it's referred to as the optical center.
+So we need, in our transformation from the real world to the image plane, we need to deal with that optical center.
+There's also parameters here within the camera matrix.
+So this three by three matrix here is our camera matrix.
+And there, effectively, the Fi and the FJ are a combination of the focal length of the camera and the scaling between individual pixels on the image plane.
+And then the last thing that's needed in order for us to be able to make this mathematics simple is a scaling factor W, which we obviously take out when we want to work out what the image coordinates I and J are.
+So, theoretically, images are continuous functions.
+So when we see an image ourselves, we don't think of it as a number of pixels.
+We think of it as a continuous two-dimensional function of typically reflected scene brightness.
+And we describe that as I and J coordinates, or we describe it in an I, J coordinate system, or rows and columns, or Xs and Ys.
+Now, Xs and Ys I tend to try and avoid because X, Y, Z typically refers to the three-dimensional world.
+So I would much prefer to stay with the I and J or the row and column in order to describe locations within an image.
+Now, to process an image on a computer, we cannot use a continuous two-dimensional function.
+So we have to do two things.
+We have to sample that image.
+So we need to take values at discrete locations in the world.
+And we also need to quantize those values that we take.
+So we need to come up with numbers.
+So 0, 1, 2, 3, 4, 5.
+We don't want continuous numbers.
+We don't want real numbers in effect.
+And here we are sampling an image.
+So if you look at this image on screen, the one on the top left has a specific number of pixels.
+And then we move from that to the one on the top right.
+The one on the top right has four times less pixels.
+So if the one on the top left was 512 by 512, the one on the top right would be 256 by 256.
+So we've reduced the dimension in both the, in terms of the number of rows and in terms of the number of columns.
+So we divided it by a factor of two.
+We can still see a lot of information in this image on the top right.
+Going again from there, we reduced the number of rows and columns again by a factor of two to the image on the bottom left.
+So this image here.
+And now we're starting to see the individual pixels appearing on the screen.
+And it's a little harder for us to understand what's going on within the scene.
+And then on the bottom right, we've reduced again by a factor of two.
+And now we're certainly seeing a lot less detail.
+It would be hard to recognize what it is we're looking at within this scene.
+So when we take a picture, we have a sensor.
+And that sensor is a two dimensional array.
+So we have a two dimensional array of photosensitive elements at the back of our camera.
+And those photosensitive elements effectively accumulate light over a few seconds.
+Over a very, very short period of time.
+In between all those photosensitive elements, there are non photosensitive gaps.
+So our image is actually not continuous at all.
+We're looking at effectively square or rectangular photosensitive elements.
+And in between those, there will be narrow strips where there's no photosensitivity at all.
+So in theory, there could be objects out there in the real world that we miss completely.
+The other thing to bear in mind is that each photosensitive element is not infinitely small.
+It may be very small, but it is accumulating light over an area, a two dimensional area.
+So it's not a single point as we might think of it in the three dimensional world.
+So the issues then are that we do have elements which have a fixed area and therefore that they are accumulating light.
+And we have this issue of gaps between them.
+So that the image that's being created is not as simple or straightforward as you and I might think it is.
+The issue of elements having a fixed area, imagine if you were considering points on the boundary of an object.
+And those points, when we look at them in the photosensitive array, you may have a point which is half on the boundary of the object and half the background.
+So you're going to get values which are neither from the foreground or the background.
+They're neither from the object you're looking at or whatever's behind it.
+They're a mixture of those two values.
+And so we can get strange colors and we can get very strange gray levels in between those two things.
+One of the questions we have when we consider sampling is how many samples do we actually require?
+If we look at this image here, so what I'm going to do is I'm going to go full screen for a second.
+And we're going to have a quick look at this video.
+Just looking at the same image at different resolutions.
+Okay.
+So our question of how many samples do we need is sort of indicated in a way by where do we have enough samples to do the processing that we want to do.
+Okay.
+So if what I was trying to do was determine the portion or the percentage of the image which is taken up by a particular type of fruit, this sort of resolution here, 64 by 64, might be enough if I can just base it off the color of the objects that I'm considering.
+If I want to find the individual fruits, I may need a higher resolution.
+Or if I'm trying to actually recognize the fruits, I probably will need a higher resolution.
+Okay.
+So if we consider the number of samples, if we use too many samples, we are wasting both space and we're wasting computation time.
+So if we take an image that has, I don't know, 2,000 pixels by 2,000 pixels, and what we're trying to do is to determine if there's an orange in the image, and the image is something like this, that's an awful lot of extra space that we didn't need to do.
+Because the oranges are going to be huge in the actual 2000 by 2000 image.
+So we need to use an appropriate resolution for the type of processing we're doing, or we're going to do an awful lot more computation than we need.
+So it needs to be enough for the objects that are of interest for us.
+And I would say it needs to be enough for the application that we're trying to address.
+So it depends what we're trying to get out of the image as to how many pixels we require in each direction.
+So the last thing here then is the number, sorry, the last thing here is the OpenCV code to do this.
+And it's very, very straightforward.
+So if we want to change an image into a different size image, we just specify the size of the other image and we call resize.
+The other thing we need to consider then when we're creating a digital image is the quantization.
+So we've now divided the image into a number of pixels.
+So a number of points in terms of rows and columns.
+So we have a two dimensional array of points.
+For each of those points, we need to represent the value at that point.
+Let's just assume we're only considering the brightness.
+And we need to represent that as a discrete value.
+Typically we use 8 bits per pixel if we're computing grayscale.
+There's nothing to stop us doing something different and using 16 or 24 or whatever number of bits we want per pixel.
+8 bits is because the old bytes used to be 8 bits.
+There still are.
+Now, if you look at the image that's on screen here, what you'll see is the original image is top left.
+We've reduced the number of grayscales in the image on the top right.
+And then we've reduced the number again.
+So the one on the top right has 6 bits per pixel.
+The one on the bottom left has 4 bits per pixel.
+And the one on the bottom right has 2 bits per pixel.
+Okay?
+Now, the one on the top right and the one on the top left,
+it is very hard for us as humans to see any difference, any significant difference between them.
+If you look really, really closely at the sky, you'll see some sort of artificial contours appearing within the sky.
+Little step effects appearing within the sky.
+They're even more obvious when you move down to the one on the bottom left,
+where you can see very, very strong contours appearing in the sky.
+Because the sky is going from a relatively dark to a relatively bright value in a slow manner.
+And then that effect becomes even worse when we move to the 2 bits per pixel.
+Those artificial contours exist no matter how many bits you're using for resolution.
+So any time that something is changing slowly,
+we're going to have these effects where we have a step from one value to another.
+You and I may not perceive it, but the computer most definitely will.
+The question then becomes how many bits do we need?
+So this is very similar to the problem we had before.
+So if we look at the example that we had on the slide,
+which just showed a single image with 8 bits,
+we can look at this same image at different numbers of bits.
+So this video is just going to run through the different numbers of bits that are possible,
+bringing this all the way down to a single bit per channel.
+Clearly a single bit here is insufficient.
+So we need more than a single bit to represent what's in this scene.
+But even at 4 bits per channel, we see the effects in the sky.
+So if they are a problem, we're going to have to bring that further back
+and give some more bits per channel.
+And it's a question of how many we need.
+So again, we don't want wasted space.
+Now there's a serious question here.
+Computers, as they're currently arranged,
+to process anything other than bytes or words is very difficult.
+Processing individual bits tends to be actually slower.
+So 8 bits per channel is not necessarily wasting an awful lot of space.
+In a way, it depends on whether we're storing these things
+and whether there's any storage issue.
+The less bits we use, the more we lose the ability to distinguish between different objects.
+And we introduce artificial contours between them as well.
+But as with most things within computer vision,
+the more detailed the representation, the harder it can be to process.
+So if we have less possible colours or less possible greyscales,
+it can make our task a little bit easier.
+If we want to change the quantisation of an image in OpenCV,
+what we do is something like this.
+So what you can see here is a loop that's going through all the rows
+and all the columns of the image.
+So we've made sure in the assert at the start that we're looking at a greyscale image.
+We're looking at a CV.
+So this is the constant that describes a greyscale image.
+It's an 8-bit image.
+The CV underscore 8 U C1.
+describes the 8-bit single channel image.
+OK.
+What we're going to do then is we're going to go through every single row
+and every single column.
+And we're basically going to mask the different pixel values
+depending on how many bits we want to have represented.
+So all we're doing is we're getting rid of the least significant bits here.
+And that is the end of the session.
+So what we've done primarily is consider the simple pinhole camera model.
+And we've considered sampling and quantisation for digital images.
+We will continue on in the next session and we'll look at colour images
+and then we'll follow that with a look at noise and smoothing.
+And that will finish our imaging section.
+Thank you for listening.
